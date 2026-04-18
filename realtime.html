@@ -28,6 +28,7 @@
     --c2: #64b5f6; --c3: #ffd54f; --c4: #b39ddb;
     --c1r: #ef9a9a; --c6: #80deea;
     --green: #81c784; --pink: #f48fb1; --orange: #ffab91;
+    --nav-h: 64px;
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -44,230 +45,182 @@
   #starCanvas {
     position: fixed; inset: 0;
     width: 100%; height: 100%;
-    pointer-events: none;
-    z-index: 0;
+    pointer-events: none; z-index: 0;
   }
 
-  /* Ambient glow behind app */
   .app {
-    max-width: 430px;
-    margin: 0 auto;
-    min-height: 100vh;
-    position: relative;
-    z-index: 1;
+    max-width: 430px; margin: 0 auto;
+    min-height: 100vh; position: relative; z-index: 1;
+    padding-bottom: var(--nav-h);
   }
   .app::before {
-    content: '';
-    position: fixed;
-    top: -50%;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 600px;
-    height: 600px;
+    content: ''; position: fixed;
+    top: -50%; left: 50%; transform: translateX(-50%);
+    width: 600px; height: 600px;
     background: radial-gradient(circle, rgba(255,213,79,0.03) 0%, transparent 70%);
-    pointer-events: none;
-    z-index: -1;
+    pointer-events: none; z-index: -1;
   }
 
   /* Loading */
   .loading-screen {
-    position: fixed; inset: 0;
-    background: var(--bg);
+    position: fixed; inset: 0; background: var(--bg);
     display: flex; flex-direction: column;
     align-items: center; justify-content: center;
-    z-index: 1000;
-    transition: opacity 0.8s ease-out;
+    z-index: 1000; transition: opacity 0.8s ease-out;
   }
   .loading-screen.hidden { opacity: 0; pointer-events: none; }
-  .loading-spinner {
-    width: 48px; height: 48px;
-    position: relative;
-  }
+  .loading-spinner { width: 48px; height: 48px; position: relative; }
   .loading-spinner::before {
-    content: '';
-    position: absolute; inset: 0;
+    content: ''; position: absolute; inset: 0;
     border: 2px solid transparent;
-    border-top-color: var(--c3);
-    border-right-color: rgba(255,213,79,0.3);
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
+    border-top-color: var(--c3); border-right-color: rgba(255,213,79,0.3);
+    border-radius: 50%; animation: spin 1s linear infinite;
   }
   .loading-spinner::after {
-    content: '';
-    position: absolute; inset: 6px;
+    content: ''; position: absolute; inset: 6px;
     border: 1.5px solid transparent;
-    border-bottom-color: var(--c2);
-    border-left-color: rgba(100,181,246,0.2);
-    border-radius: 50%;
-    animation: spin 1.5s linear infinite reverse;
+    border-bottom-color: var(--c2); border-left-color: rgba(100,181,246,0.2);
+    border-radius: 50%; animation: spin 1.5s linear infinite reverse;
   }
   @keyframes spin { 100% { transform: rotate(360deg); } }
-  .loading-text {
-    font-size: 14px; color: var(--text-sub); margin-top: 20px;
-    font-weight: 300; letter-spacing: 2px;
-  }
+  .loading-text { font-size: 14px; color: var(--text-sub); margin-top: 20px; font-weight: 300; letter-spacing: 2px; }
   .loading-sub { font-size: 11px; color: var(--text-dim); margin-top: 8px; font-family: 'Space Mono', monospace; }
 
   /* Top bar */
   .top-bar {
-    padding: 56px 20px 12px;
+    padding: 56px 20px 10px;
     display: flex; align-items: center; justify-content: space-between;
   }
   .top-logo {
-    font-size: 16px; font-weight: 700; letter-spacing: 2px;
-    text-transform: uppercase;
+    font-size: 14px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
     background: linear-gradient(135deg, var(--text) 40%, var(--c3) 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
   }
   .top-live {
     display: flex; align-items: center; gap: 6px;
-    font-size: 11px; color: var(--green);
-    font-family: 'Space Mono', monospace;
-    padding: 4px 10px;
-    background: rgba(129,199,132,0.06);
-    border: 1px solid rgba(129,199,132,0.12);
-    border-radius: 20px;
+    font-size: 11px; color: var(--green); font-family: 'Space Mono', monospace;
+    padding: 4px 10px; background: rgba(129,199,132,0.06);
+    border: 1px solid rgba(129,199,132,0.12); border-radius: 20px;
   }
   .top-live-dot {
     width: 6px; height: 6px; background: var(--green); border-radius: 50%;
-    box-shadow: 0 0 6px rgba(129,199,132,0.6);
-    animation: blink 2s ease-in-out infinite;
+    box-shadow: 0 0 6px rgba(129,199,132,0.6); animation: blink 2s ease-in-out infinite;
   }
   @keyframes blink { 0%,100%{opacity:1;}50%{opacity:.3;} }
 
-  /* Observer */
-  .observer-bar {
-    margin: 4px 20px 10px;
-    padding: 8px 14px;
-    background: var(--bg-card);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    display: flex; align-items: center; justify-content: space-between;
-    font-size: 11px; color: var(--text-dim);
-  }
-  .observer-bar .loc { color: var(--text-sub); font-weight: 500; }
+  /* Pages */
+  .page { display: none; }
+  .page.active { display: block; }
 
-  /* Oshi selector */
+  /* ===== HOME: Oshi-first ===== */
+  .oshi-hero {
+    display: flex; flex-direction: column; align-items: center;
+    padding: 24px 20px 10px; text-align: center;
+  }
+  .oshi-hero-emoji {
+    font-size: 80px; line-height: 1;
+    filter: drop-shadow(0 0 30px rgba(255,255,255,0.1));
+    animation: float 4s ease-in-out infinite;
+  }
+  @keyframes float {
+    0%,100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+  }
+  .oshi-hero-name {
+    font-size: 28px; font-weight: 900; margin-top: 10px; letter-spacing: 1px;
+  }
+  .oshi-hero-status {
+    font-size: 14px; margin-top: 6px; font-weight: 500;
+  }
+  .oshi-hero-status.on-duty { color: var(--c3); }
+  .oshi-hero-status.off-duty { color: var(--text-dim); }
+
+  /* Speech bubble */
+  .speech-bubble-wrap {
+    margin: 16px 20px 0; position: relative;
+  }
+  .speech-bubble {
+    padding: 20px 22px; border-radius: 20px;
+    font-size: 15px; line-height: 2; font-weight: 300;
+    color: var(--text-sub); position: relative;
+    backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+  }
+  .speech-bubble em { font-style: normal; font-weight: 500; }
+  .speech-bubble::before {
+    content: ''; position: absolute; top: -10px; left: 50%;
+    transform: translateX(-50%);
+    border-left: 10px solid transparent; border-right: 10px solid transparent;
+    border-bottom: 10px solid;
+  }
+  .speech-event {
+    margin-top: 12px; padding: 10px 12px;
+    background: rgba(255,255,255,0.03); border: 1px solid var(--border);
+    border-radius: 10px; display: flex; align-items: flex-start; gap: 8px;
+  }
+  .speech-event-icon { font-size: 16px; flex-shrink: 0; }
+  .speech-event-body { flex: 1; }
+  .speech-event-title { font-size: 11px; font-weight: 500; color: var(--text); }
+  .speech-event-desc { font-size: 10px; color: var(--text-sub); line-height: 1.5; }
+
+  /* Nadir info */
+  .oshi-nadir {
+    margin: 10px 20px 0; padding: 8px 14px;
+    background: var(--bg-card); border: 1px solid var(--border);
+    border-radius: 10px; font-size: 11px; color: var(--text-dim);
+    display: flex; align-items: center; justify-content: space-between;
+    font-family: 'Space Mono', monospace;
+  }
+  .oshi-nadir .loc { color: var(--text-sub); font-weight: 500; font-family: 'Noto Sans JP', sans-serif; }
+
+  /* Scroll divider */
+  .scroll-hint {
+    text-align: center; padding: 18px 0 10px;
+    font-size: 10px; color: var(--text-dim); letter-spacing: 4px;
+  }
+
+  /* Oshi selector row */
   .oshi-scroll {
     display: flex; gap: 8px; padding: 4px 20px 12px;
     overflow-x: auto; scrollbar-width: none;
   }
   .oshi-scroll::-webkit-scrollbar { display: none; }
-
   .oshi-chip {
     flex-shrink: 0; display: flex; flex-direction: column;
     align-items: center; gap: 4px; cursor: pointer; width: 60px;
     transition: transform 0.2s;
   }
   .oshi-chip:active { transform: scale(0.95); }
-
   .oshi-avatar {
     width: 48px; height: 48px; border-radius: 50%;
     display: flex; align-items: center; justify-content: center;
-    font-size: 14px; font-weight: 900; position: relative;
+    font-size: 20px; position: relative;
     border: 2px solid transparent; transition: all 0.3s;
     backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
   }
-
   .oshi-elev {
-    font-family: 'Space Mono', monospace;
-    font-size: 8px; font-weight: 700;
+    font-family: 'Space Mono', monospace; font-size: 8px; font-weight: 700;
     position: absolute; bottom: -3px;
     background: var(--bg); padding: 0 4px;
-    border-radius: 6px; border: 1px solid var(--border);
-    white-space: nowrap;
+    border-radius: 6px; border: 1px solid var(--border); white-space: nowrap;
   }
-
   .oshi-name { font-size: 9px; color: var(--text-dim); white-space: nowrap; transition: color 0.3s; }
   .oshi-chip.selected .oshi-name { color: var(--text); font-weight: 600; }
   .oshi-chip.selected .oshi-avatar {
     box-shadow: 0 0 20px rgba(255,213,79,0.25), 0 0 40px rgba(255,213,79,0.08);
     transform: scale(1.08);
   }
-  .oshi-chip.on-duty .oshi-name::after { content: ' 👑'; }
+  .oshi-chip.on-duty .oshi-name::after { content: ' \01F451'; }
 
   .sat-c2 .oshi-avatar { background: rgba(100,181,246,0.12); border-color: rgba(100,181,246,0.25); color: var(--c2); }
   .sat-c3 .oshi-avatar { background: rgba(255,213,79,0.12); border-color: rgba(255,213,79,0.3); color: var(--c3); }
   .sat-c4 .oshi-avatar { background: rgba(179,157,219,0.12); border-color: rgba(179,157,219,0.25); color: var(--c4); }
   .sat-c1r .oshi-avatar { background: rgba(239,154,154,0.12); border-color: rgba(239,154,154,0.25); color: var(--c1r); }
   .sat-c6 .oshi-avatar { background: rgba(128,222,234,0.12); border-color: rgba(128,222,234,0.25); color: var(--c6); }
-
   .oshi-chip.selected.sat-c2 .oshi-avatar { border-color: var(--c2); }
   .oshi-chip.selected.sat-c3 .oshi-avatar { border-color: var(--c3); }
   .oshi-chip.selected.sat-c4 .oshi-avatar { border-color: var(--c4); }
   .oshi-chip.selected.sat-c1r .oshi-avatar { border-color: var(--c1r); }
   .oshi-chip.selected.sat-c6 .oshi-avatar { border-color: var(--c6); }
-
-  /* Profile card */
-  .profile-card {
-    margin: 0 20px 12px;
-    padding: 20px;
-    border-radius: 20px;
-    position: relative; overflow: hidden;
-    transition: all 0.4s;
-    backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
-  }
-  .profile-card::before {
-    content: ''; position: absolute;
-    top: -40px; right: -40px;
-    width: 160px; height: 160px;
-    background: radial-gradient(circle, rgba(255,255,255,0.05), transparent 70%);
-    animation: cardGlow 6s ease-in-out infinite;
-  }
-  .profile-card::after {
-    content: ''; position: absolute;
-    bottom: -40px; left: -40px;
-    width: 120px; height: 120px;
-    background: radial-gradient(circle, rgba(255,213,79,0.04), transparent 70%);
-  }
-  @keyframes cardGlow {
-    0%, 100% { opacity: 0.5; transform: scale(1); }
-    50% { opacity: 1; transform: scale(1.1); }
-  }
-
-  .profile-top-row {
-    display: flex; align-items: center; justify-content: space-between;
-    margin-bottom: 10px;
-  }
-  .profile-identity { display: flex; align-items: center; gap: 10px; }
-  .profile-avatar {
-    width: 42px; height: 42px; border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 16px; font-weight: 900;
-  }
-  .profile-name { font-size: 18px; font-weight: 700; letter-spacing: 0.5px; }
-  .profile-sub { font-size: 10px; color: var(--text-sub); }
-  .oshi-btn {
-    padding: 5px 14px; border-radius: 20px;
-    font-size: 11px; font-weight: 700; cursor: pointer;
-    border: none; font-family: 'Noto Sans JP', sans-serif;
-    background: rgba(255,255,255,0.08);
-    color: var(--text-sub);
-    border: 1px solid var(--border);
-    transition: all 0.2s;
-  }
-  .oshi-btn.is-oshi {
-    border: 1px solid rgba(255,213,79,0.3);
-  }
-
-  .profile-grid {
-    display: grid; grid-template-columns: 1fr 1fr 1fr 1fr;
-    gap: 8px; margin-top: 12px;
-  }
-  .pg-item { text-align: center; }
-  .pg-val {
-    font-family: 'Space Mono', monospace;
-    font-size: 16px; font-weight: 700; line-height: 1;
-  }
-  .pg-label { font-size: 8px; color: var(--text-dim); margin-top: 3px; }
-
-  .profile-bio {
-    margin-top: 12px; font-size: 12px; color: var(--text-sub);
-    line-height: 1.7; font-weight: 300;
-  }
-  .profile-bio em { font-style: normal; font-weight: 500; }
 
   /* Sky plot */
   .skyplot-section {
@@ -277,85 +230,56 @@
     backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
   }
   .skyplot-title {
-    font-size: 11px; color: var(--text-dim);
-    margin-bottom: 8px; display: flex;
-    align-items: center; justify-content: space-between;
+    font-size: 11px; color: var(--text-dim); margin-bottom: 8px;
+    display: flex; align-items: center; justify-content: space-between;
     font-family: 'Space Mono', monospace;
   }
   .skyplot-container { position: relative; width: 100%; padding-bottom: 100%; }
   .skyplot-canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
 
-  /* Narrative diary */
-  .diary-section { margin: 0 20px 12px; }
-  .diary-section-title {
-    font-size: 12px; font-weight: 500; color: var(--text-sub);
-    margin-bottom: 10px; display: flex; align-items: center; gap: 8px;
+  /* Handoff card */
+  .handoff-card {
+    margin: 0 20px 14px; padding: 18px;
+    border-radius: 18px; position: relative; overflow: hidden;
+    backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+    background: linear-gradient(135deg, rgba(255,213,79,0.08), rgba(179,157,219,0.06));
+    border: 1px solid rgba(255,213,79,0.15);
+    animation: handoffSlideIn 0.6s cubic-bezier(0.22, 1, 0.36, 1);
   }
-  .diary-section-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
-
-  .diary-post {
-    background: linear-gradient(180deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.015) 100%);
-    border: 1px solid var(--border);
-    border-radius: 18px; overflow: hidden; margin-bottom: 10px;
-    backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
-    transition: transform 0.2s;
+  @keyframes handoffSlideIn {
+    from { opacity: 0; transform: translateY(20px) scale(0.96); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
   }
-  .diary-post:active { transform: scale(0.99); }
-
-  .post-header {
-    padding: 12px 14px 0;
-    display: flex; align-items: center; gap: 8px;
+  .handoff-label {
+    font-size: 10px; font-weight: 700; letter-spacing: 2px;
+    color: var(--c3); margin-bottom: 10px; font-family: 'Space Mono', monospace;
   }
-  .post-avatar {
-    width: 28px; height: 28px; border-radius: 50%;
+  .handoff-pair {
     display: flex; align-items: center; justify-content: center;
-    font-size: 10px; font-weight: 900; flex-shrink: 0;
+    gap: 12px; font-size: 36px; margin: 8px 0;
   }
-  .post-meta { flex: 1; }
-  .post-author { font-size: 12px; font-weight: 600; }
-  .post-time { font-size: 9px; color: var(--text-dim); font-family: 'Space Mono', monospace; }
+  .handoff-arrow { font-size: 20px; color: var(--c3); }
+  .handoff-names {
+    text-align: center; font-size: 13px; color: var(--text-sub); margin-bottom: 10px;
+  }
+  .handoff-convo {
+    padding: 12px; background: rgba(0,0,0,0.2);
+    border-radius: 12px; margin-top: 8px;
+  }
+  .handoff-line {
+    font-size: 12px; line-height: 1.8; color: var(--text-sub);
+    padding: 2px 0;
+  }
+  .handoff-line em { font-style: normal; font-weight: 600; }
 
-  .post-body {
-    padding: 10px 14px 14px;
-    font-size: 13px; line-height: 1.9;
-    color: var(--text-sub); font-weight: 300;
-  }
-  .post-body em { font-style: normal; font-weight: 500; }
-
-  .post-event {
-    margin: 0 14px 12px; padding: 10px 12px;
-    background: rgba(255,255,255,0.02);
-    border: 1px solid var(--border); border-radius: 10px;
-    display: flex; align-items: flex-start; gap: 8px;
-  }
-  .pe-icon { font-size: 16px; flex-shrink: 0; }
-  .pe-body { flex: 1; }
-  .pe-title { font-size: 11px; font-weight: 500; color: var(--text); }
-  .pe-desc { font-size: 10px; color: var(--text-sub); line-height: 1.5; }
-
-  .post-footer {
-    padding: 6px 14px 10px;
-    display: flex; align-items: center; gap: 18px;
-    border-top: 1px solid rgba(255,255,255,0.03);
-  }
-  .pf-action {
-    display: flex; align-items: center; gap: 4px;
-    font-size: 11px; color: var(--text-dim); cursor: pointer;
-  }
-  .pf-action.liked { color: var(--pink); }
-
-  /* All sats */
+  /* Constellation list */
   .sats-list { margin: 0 20px 12px; }
-  .sats-list-title {
-    font-size: 12px; font-weight: 500; color: var(--text-sub);
-    margin-bottom: 8px;
-  }
+  .sats-list-title { font-size: 12px; font-weight: 500; color: var(--text-sub); margin-bottom: 8px; }
   .sr {
     display: flex; align-items: center; gap: 10px;
     padding: 12px 14px; background: var(--bg-card);
     border: 1px solid var(--border); border-radius: 14px;
-    margin-bottom: 8px; transition: all 0.3s;
-    cursor: pointer;
+    margin-bottom: 8px; transition: all 0.3s; cursor: pointer;
     backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
   }
   .sr:active { transform: scale(0.98); }
@@ -364,11 +288,10 @@
     background: linear-gradient(135deg, rgba(255,213,79,0.06), rgba(255,213,79,0.02));
     box-shadow: 0 0 20px rgba(255,213,79,0.04);
   }
-  .sr.is-selected { border-color: rgba(255,255,255,0.15); }
   .sr-av {
     width: 32px; height: 32px; border-radius: 50%;
     display: flex; align-items: center; justify-content: center;
-    font-size: 10px; font-weight: 900; flex-shrink: 0;
+    font-size: 16px; flex-shrink: 0;
   }
   .sr-info { flex: 1; }
   .sr-name { font-size: 12px; font-weight: 500; }
@@ -380,7 +303,7 @@
     margin-top: 2px; display: inline-block;
   }
 
-  /* Source */
+  /* Source bar */
   .source-bar {
     margin: 4px 20px 20px; padding: 10px 14px;
     background: var(--bg-card); border: 1px solid var(--border);
@@ -388,16 +311,140 @@
     line-height: 1.6; font-family: 'Space Mono', monospace;
   }
 
+  /* ===== CARDS PAGE ===== */
+  .cards-header {
+    padding: 20px 20px 10px; text-align: center;
+  }
+  .cards-header h2 { font-size: 18px; font-weight: 700; }
+  .cards-count { font-size: 12px; color: var(--text-sub); margin-top: 4px; }
+  .cards-grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 12px; padding: 10px 20px 20px;
+  }
+  .cards-empty {
+    text-align: center; padding: 40px 20px;
+    color: var(--text-dim); font-size: 13px;
+  }
+
+  /* QSL Card */
+  .qsl-card {
+    background: linear-gradient(145deg, #1a1c2e 0%, #12142a 100%);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 12px; padding: 14px;
+    position: relative; overflow: hidden;
+    transform: rotate(-1deg);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4), 0 2px 8px rgba(0,0,0,0.3);
+    transition: transform 0.2s;
+  }
+  .qsl-card:active { transform: rotate(0deg) scale(0.97); }
+  .qsl-card::before {
+    content: ''; position: absolute; inset: 0;
+    background: repeating-linear-gradient(
+      0deg, transparent, transparent 3px,
+      rgba(255,255,255,0.008) 3px, rgba(255,255,255,0.008) 4px
+    );
+    pointer-events: none;
+  }
+  .qsl-card::after {
+    content: ''; position: absolute; top: -30px; right: -30px;
+    width: 80px; height: 80px;
+    background: radial-gradient(circle, rgba(255,213,79,0.06), transparent 70%);
+    pointer-events: none;
+  }
+  .qsl-top { font-size: 7px; font-weight: 700; letter-spacing: 2px; color: var(--text-dim); font-family: 'Space Mono', monospace; }
+  .qsl-divider { height: 1px; background: var(--border); margin: 6px 0; }
+  .qsl-label { font-size: 8px; color: var(--text-dim); margin-top: 4px; }
+  .qsl-pair {
+    display: flex; align-items: center; justify-content: center;
+    gap: 6px; font-size: 24px; margin: 6px 0;
+  }
+  .qsl-pair-arrow { font-size: 12px; color: var(--c3); }
+  .qsl-names { text-align: center; font-size: 10px; color: var(--text-sub); }
+  .qsl-time { font-size: 9px; font-family: 'Space Mono', monospace; color: var(--text-dim); margin-top: 6px; }
+  .qsl-nadir { font-size: 9px; color: var(--text-sub); }
+  .qsl-elev { font-size: 8px; font-family: 'Space Mono', monospace; color: var(--text-dim); }
+  .qsl-rarity {
+    margin-top: 6px; font-size: 10px; font-weight: 700; letter-spacing: 1px;
+  }
+  .qsl-rarity-n { color: var(--text-dim); }
+  .qsl-rarity-r { color: var(--c3); }
+  .qsl-rarity-sr { color: var(--c4); text-shadow: 0 0 8px rgba(179,157,219,0.4); }
+  .qsl-rarity-ssr { color: var(--pink); text-shadow: 0 0 12px rgba(244,143,177,0.5); animation: shimmer 2s ease-in-out infinite; }
+  @keyframes shimmer { 0%,100%{opacity:1;}50%{opacity:0.7;} }
+  .qsl-flavor { font-size: 8px; color: var(--text-sub); font-style: italic; margin-top: 2px; }
+  .qsl-number { font-size: 8px; font-family: 'Space Mono', monospace; color: var(--text-dim); margin-top: 6px; }
+  .qsl-footer { font-size: 7px; font-family: 'Space Mono', monospace; color: var(--text-dim); margin-top: 4px; text-align: right; }
+
+  /* QSL large (detail modal view) */
+  .qsl-card.large {
+    transform: rotate(-2deg); max-width: 320px; margin: 20px auto; padding: 20px;
+  }
+  .qsl-card.large .qsl-pair { font-size: 36px; }
+  .qsl-card.large .qsl-names { font-size: 13px; }
+
+  /* ===== SETTINGS PAGE ===== */
+  .settings-section {
+    padding: 20px;
+  }
+  .settings-section h2 { font-size: 18px; font-weight: 700; margin-bottom: 16px; }
+  .settings-oshi-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+  }
+  .settings-oshi-btn {
+    padding: 16px; border-radius: 14px; cursor: pointer;
+    background: var(--bg-card); border: 1px solid var(--border);
+    display: flex; flex-direction: column; align-items: center; gap: 6px;
+    transition: all 0.2s;
+  }
+  .settings-oshi-btn:active { transform: scale(0.97); }
+  .settings-oshi-btn.selected { border-color: rgba(255,213,79,0.4); background: rgba(255,213,79,0.06); }
+  .settings-oshi-btn .emoji { font-size: 32px; }
+  .settings-oshi-btn .name { font-size: 13px; font-weight: 600; }
+  .settings-oshi-btn .sub { font-size: 10px; color: var(--text-dim); }
+
+  .settings-info {
+    margin-top: 20px; padding: 14px;
+    background: var(--bg-card); border: 1px solid var(--border);
+    border-radius: 12px; font-size: 11px; color: var(--text-dim); line-height: 1.8;
+  }
+
+  /* ===== BOTTOM NAV ===== */
+  .bottom-nav {
+    position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+    width: 100%; max-width: 430px; height: var(--nav-h);
+    background: rgba(6,8,26,0.92);
+    backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+    border-top: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-around;
+    z-index: 100; padding-bottom: env(safe-area-inset-bottom, 0);
+  }
+  .nav-btn {
+    display: flex; flex-direction: column; align-items: center; gap: 3px;
+    cursor: pointer; padding: 8px 16px; border-radius: 12px;
+    transition: all 0.2s; -webkit-tap-highlight-color: transparent;
+  }
+  .nav-btn:active { transform: scale(0.93); }
+  .nav-icon { font-size: 20px; }
+  .nav-label { font-size: 9px; color: var(--text-dim); font-weight: 500; transition: color 0.2s; }
+  .nav-btn.active .nav-label { color: var(--c3); }
+  .nav-btn.active { background: rgba(255,213,79,0.06); }
+  .nav-badge {
+    position: absolute; top: 2px; right: 8px;
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--pink); border: 1.5px solid var(--bg);
+  }
+
+  /* Utility */
   .fade-in { animation: fadeIn 0.6s cubic-bezier(0.22, 1, 0.36, 1) both; }
   @keyframes fadeIn {
     from { opacity: 0; transform: translateY(16px) scale(0.98); }
     to { opacity: 1; transform: translateY(0) scale(1); }
   }
-
-  /* Smooth transitions for dynamic content */
-  .profile-grid, .sr-elev, .pg-val {
-    transition: color 0.3s ease;
+  .section-title {
+    font-size: 12px; font-weight: 500; color: var(--text-sub);
+    margin: 0 20px 8px; display: flex; align-items: center; gap: 8px;
   }
+  .section-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
   ::-webkit-scrollbar { display: none; }
 </style>
 </head>
@@ -412,68 +459,122 @@
   </div>
 
   <div id="main" style="display:none;">
+    <!-- Top bar (always visible) -->
     <div class="top-bar fade-in">
       <div class="top-logo">ORBIT DIARY</div>
       <div class="top-live"><div class="top-live-dot"></div>LIVE <span id="clock">--:--:--</span></div>
     </div>
-    <div class="observer-bar fade-in">
-      <span>📍 <span class="loc" id="obsName">東京</span></span>
-      <span id="obsCoords">35.68°N, 139.77°E</span>
+
+    <!-- PAGE: Home -->
+    <div class="page active" id="pageHome">
+      <div class="oshi-hero fade-in" id="oshiHero"></div>
+      <div class="speech-bubble-wrap fade-in" id="speechWrap"></div>
+      <div class="oshi-nadir fade-in" id="oshiNadir"></div>
+
+      <div class="scroll-hint">── scroll down ──</div>
+
+      <div class="section-title fade-in">推しを選ぶ</div>
+      <div class="oshi-scroll fade-in" id="oshiBar"></div>
+
+      <div class="skyplot-section fade-in">
+        <div class="skyplot-title"><span>SKY PLOT</span><span id="skyTime">--:--:--</span></div>
+        <div class="skyplot-container"><canvas class="skyplot-canvas" id="skyCanvas"></canvas></div>
+      </div>
+
+      <div id="handoffCard"></div>
+
+      <div class="section-title fade-in">コンステレーション全機</div>
+      <div class="sats-list fade-in"><div id="satsList"></div></div>
+
+      <div id="cardPreview"></div>
+      <div class="source-bar fade-in" id="sourceBar"></div>
+      <div style="height:20px;"></div>
     </div>
-    <div class="oshi-scroll fade-in" id="oshiBar"></div>
-    <div class="profile-card fade-in" id="profileCard"></div>
-    <div class="skyplot-section fade-in">
-      <div class="skyplot-title"><span>SKY PLOT</span><span id="skyTime">--:--:--</span></div>
-      <div class="skyplot-container"><canvas class="skyplot-canvas" id="skyCanvas"></canvas></div>
+
+    <!-- PAGE: All satellites -->
+    <div class="page" id="pageSats">
+      <div style="padding:20px 20px 10px;"><h2 style="font-size:18px;font-weight:700;">みちびき全5機</h2></div>
+      <div class="sats-list"><div id="satsListFull"></div></div>
+      <div class="source-bar" id="sourceBarSats"></div>
+      <div style="height:20px;"></div>
     </div>
-    <div class="diary-section fade-in" id="diarySection"></div>
-    <div class="sats-list fade-in">
-      <div class="sats-list-title">コンステレーション全機</div>
-      <div id="satsList"></div>
+
+    <!-- PAGE: Cards -->
+    <div class="page" id="pageCards">
+      <div class="cards-header">
+        <h2>QSL カードコレクション</h2>
+        <div class="cards-count" id="cardsCount"></div>
+      </div>
+      <div id="cardsContent"></div>
+      <div style="height:20px;"></div>
     </div>
-    <div class="source-bar fade-in" id="sourceBar"></div>
-    <div style="height:20px;"></div>
+
+    <!-- PAGE: Settings -->
+    <div class="page" id="pageSettings">
+      <div class="settings-section">
+        <h2>推し設定</h2>
+        <div class="settings-oshi-grid" id="settingsOshiGrid"></div>
+        <div class="settings-info" id="settingsInfo">
+          📍 観測地: 東京 (35.68°N, 139.77°E)<br>
+          TLE更新: 1秒間隔リアルタイム計算<br>
+          SGP4 via satellite.js
+        </div>
+      </div>
+    </div>
   </div>
+
+  <!-- Bottom nav -->
+  <nav class="bottom-nav" id="bottomNav" style="display:none;">
+    <div class="nav-btn active" onclick="switchPage('home')">
+      <span class="nav-icon">&#x1F3E0;</span><span class="nav-label">ホーム</span>
+    </div>
+    <div class="nav-btn" onclick="switchPage('sats')">
+      <span class="nav-icon">&#x1F6F0;</span><span class="nav-label">みんな</span>
+    </div>
+    <div class="nav-btn" onclick="switchPage('cards')" style="position:relative;">
+      <span class="nav-icon">&#x1F3B4;</span><span class="nav-label">カード</span>
+    </div>
+    <div class="nav-btn" onclick="switchPage('settings')">
+      <span class="nav-icon">&#x2699;</span><span class="nav-label">設定</span>
+    </div>
+  </nav>
 </div>
 
 <script>
 // ========== CONFIG ==========
 const SATS = [
-  // QZO (figure-8 orbit)
   { id:'qzs2',  norad:42738, name:'みちびき2号機',  short:'02', type:'QZO', color:'#64b5f6', cd:'rgba(100,181,246,', cls:'c2',  launched:'2017.6.1',
-    nickname: 'ニーちゃん', emoji: '😎',
-    personality: 'cool',  // クール系・寡黙・頼れる兄貴
+    nickname:'ニーちゃん', emoji:'😎',
+    personality:'cool',
     bio:'寡黙だけど仕事は確実。深夜〜早朝のシフトが多くて、みんなが寝てる間も黙々と信号を送り続けてる。口数は少ないけど、いざという時いちばん頼りになるタイプ。',
-    tone: { prefix: '…', suffix: '。', style: 'terse' },
+    tone:{ prefix:'…', suffix:'。', style:'terse' },
   },
   { id:'qzs4',  norad:42965, name:'みちびき4号機',  short:'04', type:'QZO', color:'#b39ddb', cd:'rgba(179,157,219,', cls:'c4',  launched:'2017.10.10',
-    nickname: 'ヨンちゃん', emoji: '✨',
-    personality: 'genki',  // 元気系・おしゃべり・アイドル気質
+    nickname:'ヨンちゃん', emoji:'✨',
+    personality:'genki',
     bio:'いちばんテンション高い。夕方〜夜のシフトで夜景を見るのが大好き。「今日も日本キレイ！」が口癖。ファンサが手厚い。自分のこと「ヨンちゃん」って呼ぶ。',
-    tone: { prefix: '', suffix: '！', style: 'excited' },
+    tone:{ prefix:'', suffix:'！', style:'excited' },
   },
   { id:'qzs1r', norad:49336, name:'初号機後継(1R)',  short:'1R', type:'QZO', color:'#ef9a9a', cd:'rgba(239,154,154,', cls:'c1r', launched:'2021.10.26',
-    nickname: 'いちあーる', emoji: '🔥',
-    personality: 'earnest',  // 真面目系・初代の意志を継ぐ・熱い
+    nickname:'いちあーる', emoji:'🔥',
+    personality:'earnest',
     bio:'初代みちびきの軌道を引き継いだ。先代への敬意が強くて「初号機の分まで」が信条。真面目すぎてたまに空回りするけど、その一生懸命さがファンに刺さる。',
-    tone: { prefix: '', suffix: 'っ！', style: 'earnest' },
+    tone:{ prefix:'', suffix:'っ！', style:'earnest' },
   },
-  // GEO (geostationary)
   { id:'qzs3',  norad:42917, name:'みちびき3号機',  short:'03', type:'GEO', color:'#ffd54f', cd:'rgba(255,213,79,',  cls:'c3',  launched:'2017.8.19',
-    nickname: 'さんちゃん', emoji: '🍵',
-    personality: 'calm',  // 落ち着き系・母性・見守り役
+    nickname:'さんちゃん', emoji:'🍵',
+    personality:'calm',
     bio:'静止軌道からずっと同じ場所にいる。動かないことが強み。QZOの3機がわちゃわちゃしてるのを「まぁまぁ」って見守るお姉さんポジション。お茶が好き（設定）。',
-    tone: { prefix: '', suffix: 'ね。', style: 'gentle' },
+    tone:{ prefix:'', suffix:'ね。', style:'gentle' },
   },
   { id:'qzs6',  norad:62876, name:'みちびき6号機',  short:'06', type:'GEO', color:'#80deea', cd:'rgba(128,222,234,', cls:'c6',  launched:'2025.3.10',
-    nickname: 'ろくちゃん', emoji: '🐣',
-    personality: 'shy',  // 新人・おどおど・成長枠
+    nickname:'ろくちゃん', emoji:'🐣',
+    personality:'shy',
     bio:'2025年に打ち上げられたばかりの最年少。3号機のとなりに配属されて緊張中。「あの…ちゃんとできてますか？」が口癖。でも信号の安定性は実はいちばん良い。',
-    tone: { prefix: 'あの…', suffix: 'です…', style: 'shy' },
+    tone:{ prefix:'あの…', suffix:'です…', style:'shy' },
   },
 ];
 
-// Real TLEs fetched 2026-04-18 — used only when CelesTrak is unreachable
 const FALLBACK_TLES = {
   42738: ['1 42738U 17028A   26107.24072517 -.00000198  00000+0  00000+0 0  9993','2 42738  39.5227 244.0421 0741049 270.7350 276.1592  1.00250096  7013'],
   42917: ['1 42917U 17048A   26107.22127874 -.00000341  00000+0  00000+0 0  9999','2 42917   0.0570 208.2508 0001336 158.5376  45.2143  1.00275511 31645'],
@@ -483,9 +584,7 @@ const FALLBACK_TLES = {
 };
 
 // ========== REVERSE GEOCODING ==========
-// Japan: nearest-point within 150km. Overseas/ocean: bounding boxes. No catch-all.
 const JP_POINTS = [
-  // Hokkaido
   [45.42,141.67,'稚内・宗谷',[{icon:'🐄',title:'宗谷の牧場',desc:'日本最北端の酪農地帯。GPS首輪で牛の放牧管理。'}]],
   [44.92,142.39,'紋別・オホーツク',[{icon:'🐟',title:'オホーツクの漁場',desc:'ホタテ養殖場の位置管理にcm級測位。'}]],
   [43.77,142.37,'旭川・上川',[{icon:'🌾',title:'上川盆地の米どころ',desc:'施肥マップを衛星測位で管理。'}]],
@@ -495,14 +594,12 @@ const JP_POINTS = [
   [43.33,145.58,'根室',[{icon:'🐟',title:'根室のカニ漁',desc:'濃霧の海域で衛星測位が安全航行の命綱。'}]],
   [41.77,140.73,'函館',[{icon:'⛵',title:'津軽海峡フェリー',desc:'濃霧の海峡でcm級の精密航行。'}]],
   [42.63,141.60,'苫小牧・千歳',[{icon:'✈️',title:'新千歳空港',desc:'航空機の地上走行をcm級で追跡。'}]],
-  // Tohoku
   [40.82,140.74,'青森',[{icon:'🍎',title:'津軽のりんご畑',desc:'果樹1本ずつ衛星測位で管理。'}]],
   [39.72,140.10,'秋田',[{icon:'🌾',title:'あきたこまちの田んぼ',desc:'ドローン散布の経路をcm級で制御。'}]],
   [39.70,141.14,'盛岡・岩手',[{icon:'🏗️',title:'三陸のICT施工',desc:'重機の自動制御にcm級測位。'}]],
   [38.27,140.87,'仙台',[{icon:'🚄',title:'東北新幹線はやぶさ',desc:'時速320kmでもcm級の位置把握。'}]],
   [38.24,140.33,'山形',[{icon:'🍒',title:'さくらんぼ畑',desc:'品種ごとの生育データを座標に紐づけ。'}]],
   [37.75,140.47,'福島',[{icon:'🍑',title:'福島の桃畑',desc:'圃場ごとの土壌データを衛星測位で地図化。'}]],
-  // Kanto
   [36.57,139.88,'宇都宮・栃木',[{icon:'🍓',title:'とちおとめの温室',desc:'ロボット搬送車がcm級で自動走行。'}]],
   [36.39,139.06,'前橋・群馬',[{icon:'🥬',title:'嬬恋のキャベツ畑',desc:'ドローン散布の経路をcm級で制御。'}]],
   [36.34,140.45,'水戸・茨城',[{icon:'🚀',title:'JAXA筑波宇宙センター上空',desc:'みちびきの管制施設の真上を通過中。'}]],
@@ -514,7 +611,6 @@ const JP_POINTS = [
   ]],
   [35.44,139.64,'横浜',[{icon:'🛳️',title:'横浜港の入港管理',desc:'コンテナ船の着岸支援にcm級測位。'}]],
   [35.61,140.12,'千葉',[{icon:'✈️',title:'成田空港の地上管制',desc:'航空機のタキシングをcm級で追跡。'}]],
-  // Chubu
   [35.66,138.57,'甲府・山梨',[{icon:'🍇',title:'甲州ぶどう畑',desc:'日照・土壌を座標に紐づけ品質管理。'}]],
   [35.36,138.73,'富士山付近',[{icon:'🗻',title:'富士山の登山者見守り',desc:'救助時の位置特定にも衛星測位。'}]],
   [37.90,139.02,'新潟',[{icon:'🌾',title:'コシヒカリの田んぼ',desc:'水田の水位管理にIoT+衛星測位。'}]],
@@ -525,7 +621,6 @@ const JP_POINTS = [
   [35.39,136.72,'岐阜',[]],
   [35.18,136.91,'名古屋',[{icon:'🚗',title:'トヨタの自動運転テスト',desc:'cm級測位が車線維持精度を支える。'}]],
   [34.98,138.38,'静岡',[{icon:'🍵',title:'静岡の茶畑',desc:'区画ごとの生育データを衛星測位で管理。'}]],
-  // Kinki
   [35.00,135.87,'大津・滋賀',[{icon:'⛵',title:'琵琶湖の水質モニタリング',desc:'観測ブイの位置をcm級で管理。'}]],
   [35.01,135.77,'京都',[{icon:'🚶',title:'路地裏ナビ',desc:'碁盤の目の奥までcm級で案内。'}]],
   [34.69,135.50,'大阪',[{icon:'🚗',title:'阪神高速のレーン判定',desc:'複雑な都市高速でcm級の分岐案内。'}]],
@@ -533,18 +628,15 @@ const JP_POINTS = [
   [34.69,135.83,'奈良',[]],
   [34.23,135.17,'和歌山',[{icon:'🍊',title:'有田みかんの段々畑',desc:'傾斜地でドローン散布にcm級が必要。'}]],
   [34.73,136.51,'津・三重',[{icon:'🦐',title:'伊勢湾の養殖場',desc:'養殖いかだの位置をcm級で管理。'}]],
-  // Chugoku
   [35.50,134.24,'鳥取',[{icon:'🏖️',title:'鳥取砂丘のARナビ',desc:'目印のない砂地でcm級で現在地案内。'}]],
   [35.47,133.05,'松江・島根',[]],
   [34.66,133.93,'岡山',[{icon:'🍑',title:'白桃の果樹園',desc:'果樹1本ずつの生育データを管理。'}]],
   [34.40,132.46,'広島',[{icon:'⛵',title:'瀬戸内海の航路',desc:'島々の間の狭い海峡でcm級航行。'}]],
   [34.19,131.47,'山口・下関',[{icon:'⛵',title:'関門海峡の航行管理',desc:'狭水道でcm級の精密航行。'}]],
-  // Shikoku
   [34.34,134.04,'高松・香川',[{icon:'🍜',title:'讃岐うどん県の物流',desc:'配送トラックのルート最適化にcm級。'}]],
   [34.07,134.56,'徳島',[{icon:'🌊',title:'鳴門の渦潮観測',desc:'観光船の精密航行と渦潮位置記録。'}]],
   [33.84,132.77,'松山・愛媛',[{icon:'🍊',title:'愛媛みかんの段々畑',desc:'急傾斜地でドローンにcm級が必須。'}]],
   [33.56,133.53,'高知',[{icon:'🐟',title:'カツオ一本釣り漁船',desc:'操業位置を記録。黒潮と漁場の関係を分析。'}]],
-  // Kyushu
   [33.59,130.40,'福岡・博多',[{icon:'🚄',title:'九州新幹線が走行中',desc:'車両制御にQZSS高精度測位。'}]],
   [33.25,130.30,'佐賀',[]],
   [32.75,129.87,'長崎',[{icon:'⛵',title:'五島列島の漁船',desc:'離島の漁業。衛星測位で安全航行。'}]],
@@ -552,7 +644,6 @@ const JP_POINTS = [
   [33.24,131.61,'大分・別府',[]],
   [31.91,131.42,'宮崎',[{icon:'🌿',title:'杉林の森林管理',desc:'樹木1本ずつ管理。間伐計画の精度向上。'}]],
   [31.60,130.56,'鹿児島',[{icon:'🌋',title:'桜島の火山監視',desc:'地殻変動をcm級で検出。噴火予測の基礎。'}]],
-  // Islands
   [30.37,130.66,'屋久島',[{icon:'🌿',title:'屋久杉の森林モニタリング',desc:'世界遺産の森を精密マッピング。'}]],
   [28.38,129.49,'奄美大島',[{icon:'🐰',title:'アマミノクロウサギ調査',desc:'GPS首輪で希少種の行動圏を追跡。'}]],
   [26.33,127.80,'那覇・沖縄本島',[{icon:'🐋',title:'ホエールウォッチング',desc:'クジラの目撃座標をcm級で記録。'}]],
@@ -561,111 +652,122 @@ const JP_POINTS = [
   [27.09,142.19,'小笠原・父島',[{icon:'⛵',title:'離島漁業の命綱',desc:'本土から1,000km。衛星信号が安全航行を支える。'}]],
 ];
 
-const JP_RADIUS_KM = 200; // 200kmに拡大
+const JP_RADIUS_KM = 200;
 
-// 日本近海の海域ポイント（JP_POINTSと同じ最近傍方式で使う）
 const SEA_POINTS = [
-  // 日本近海 — QZO衛星の直下点がよく通る海域
-  [34.0, 140.0, '房総沖（太平洋）', [{icon:'🛳️',title:'東京湾口の航路',desc:'東京湾に入る大型船の航行管理にcm級測位。'}]],
-  [32.0, 140.0, '伊豆諸島南方沖', [{icon:'⛵',title:'八丈島の漁船',desc:'黒潮の真っ只中。衛星測位で漁場を記録。'}]],
-  [30.0, 140.0, '小笠原北方海域', [{icon:'🐋',title:'ザトウクジラの回遊路',desc:'冬季の回遊ルート上。目撃座標をcm級で記録。'}]],
-  [28.0, 139.0, '小笠原近海', [{icon:'⛵',title:'小笠原漁業の海域',desc:'本土から1,000km。衛星信号が安全航行の命綱。'}]],
-  [25.0, 138.0, '南方海域（硫黄島方面）', [{icon:'🌊',title:'深海調査船が活動中',desc:'海底地形調査にcm級の精密測位。'}]],
-  [22.0, 138.0, '南方海域（マリアナ方面）', [{icon:'🛳️',title:'太平洋航路上',desc:'日本〜グアム・パラオ航路の貨物船。衛星測位で航路管理。'}]],
-  [20.0, 136.0, '北マリアナ海域', []],
-  [15.0, 135.0, 'マリアナ海域', []],
-  [10.0, 135.0, '西太平洋赤道付近', []],
-  [5.0, 135.0, '赤道付近（パラオ北方）', []],
-  [0.0, 135.0, '赤道上（東経135°）', [{icon:'🌊',title:'赤道直下',desc:'静止軌道衛星の直下点。地球の自転と同じ速度で移動中。'}]],
-  [0.0, 127.0, '赤道上（モルッカ海付近）', []],
-  [0.0, 140.0, '赤道上（ニューギニア北方）', []],
-  [0.0, 90.0, '赤道上（インド洋）', []],
-  [-5.0, 135.0, '赤道南方（アラフラ海方面）', []],
-  [-10.0, 140.0, 'アラフラ海上空', []],
-  [-15.0, 145.0, 'コーラル海上空', []],
-  [-20.0, 145.0, 'オーストラリア北東沖', []],
-  [-25.0, 148.0, 'オーストラリア東方沖', []],
-  [-30.0, 150.0, 'タスマン海北部', []],
-  [-35.0, 150.0, 'タスマン海', []],
-  [-40.0, 148.0, '南太平洋（タスマニア沖）', []],
-  // 日本海側
-  [38.0, 134.0, '日本海（中部）', [{icon:'🛳️',title:'日本海航路',desc:'貨物船の航行管理。荒天時も正確な位置情報。'}]],
-  [42.0, 135.0, '日本海（北部）', []],
-  // 太平洋側
-  [36.0, 143.0, '三陸沖（太平洋）', [{icon:'🐟',title:'三陸沖の漁場',desc:'世界三大漁場のひとつ。操業位置を衛星測位で記録。'}]],
-  [40.0, 145.0, '北海道東方沖', [{icon:'🐟',title:'北洋漁業の海域',desc:'スケソウダラ・サケの操業管理に衛星測位。'}]],
-  [30.0, 132.0, '四国沖（太平洋）', [{icon:'🐟',title:'黒潮の漁場',desc:'カツオ・マグロの操業位置を記録。'}]],
-  [28.0, 128.0, '南西諸島海域', [{icon:'🐋',title:'ザトウクジラのシーズン',desc:'冬〜春の回遊。目撃座標をcm級で記録。'}]],
-  [20.0, 125.0, 'バシー海峡方面', []],
+  [34.0,140.0,'房総沖（太平洋）',[{icon:'🛳️',title:'東京湾口の航路',desc:'東京湾に入る大型船の航行管理にcm級測位。'}]],
+  [32.0,140.0,'伊豆諸島南方沖',[{icon:'⛵',title:'八丈島の漁船',desc:'黒潮の真っ只中。衛星測位で漁場を記録。'}]],
+  [30.0,140.0,'小笠原北方海域',[{icon:'🐋',title:'ザトウクジラの回遊路',desc:'冬季の回遊ルート上。目撃座標をcm級で記録。'}]],
+  [28.0,139.0,'小笠原近海',[{icon:'⛵',title:'小笠原漁業の海域',desc:'本土から1,000km。衛星信号が安全航行の命綱。'}]],
+  [25.0,138.0,'南方海域（硫黄島方面）',[{icon:'🌊',title:'深海調査船が活動中',desc:'海底地形調査にcm級の精密測位。'}]],
+  [22.0,138.0,'南方海域（マリアナ方面）',[{icon:'🛳️',title:'太平洋航路上',desc:'日本〜グアム・パラオ航路の貨物船。衛星測位で航路管理。'}]],
+  [20.0,136.0,'北マリアナ海域',[]],
+  [15.0,135.0,'マリアナ海域',[]],
+  [10.0,135.0,'西太平洋赤道付近',[]],
+  [5.0,135.0,'赤道付近（パラオ北方）',[]],
+  [0.0,135.0,'赤道上（東経135°）',[{icon:'🌊',title:'赤道直下',desc:'静止軌道衛星の直下点。地球の自転と同じ速度で移動中。'}]],
+  [0.0,127.0,'赤道上（モルッカ海付近）',[]],
+  [0.0,140.0,'赤道上（ニューギニア北方）',[]],
+  [0.0,90.0,'赤道上（インド洋）',[]],
+  [-5.0,135.0,'赤道南方（アラフラ海方面）',[]],
+  [-10.0,140.0,'アラフラ海上空',[]],
+  [-15.0,145.0,'コーラル海上空',[]],
+  [-20.0,145.0,'オーストラリア北東沖',[]],
+  [-25.0,148.0,'オーストラリア東方沖',[]],
+  [-30.0,150.0,'タスマン海北部',[]],
+  [-35.0,150.0,'タスマン海',[]],
+  [-40.0,148.0,'南太平洋（タスマニア沖）',[]],
+  [38.0,134.0,'日本海（中部）',[{icon:'🛳️',title:'日本海航路',desc:'貨物船の航行管理。荒天時も正確な位置情報。'}]],
+  [42.0,135.0,'日本海（北部）',[]],
+  [36.0,143.0,'三陸沖（太平洋）',[{icon:'🐟',title:'三陸沖の漁場',desc:'世界三大漁場のひとつ。操業位置を衛星測位で記録。'}]],
+  [40.0,145.0,'北海道東方沖',[{icon:'🐟',title:'北洋漁業の海域',desc:'スケソウダラ・サケの操業管理に衛星測位。'}]],
+  [30.0,132.0,'四国沖（太平洋）',[{icon:'🐟',title:'黒潮の漁場',desc:'カツオ・マグロの操業位置を記録。'}]],
+  [28.0,128.0,'南西諸島海域',[{icon:'🐋',title:'ザトウクジラのシーズン',desc:'冬〜春の回遊。目撃座標をcm級で記録。'}]],
+  [20.0,125.0,'バシー海峡方面',[]],
 ];
 
-// 海外はbounding box（日本近海以外のエリア）
 const OVERSEAS_REGIONS = [
-  { name:'韓国上空',         flag:'🇰🇷', lat:[33,43],    lon:[124,130],  events:[{icon:'📡',title:'東アジアの測位補強',desc:'みちびきの信号は周辺地域の測位精度も向上させている。'}] },
-  { name:'台湾上空',         flag:'🇹🇼', lat:[21,26],    lon:[119,123],  events:[] },
-  { name:'中国東部上空',     flag:'🇨🇳', lat:[20,45],    lon:[105,125],  events:[] },
-  { name:'フィリピン上空',   flag:'🇵🇭', lat:[5,20],     lon:[117,127],  events:[{icon:'⛵',title:'フィリピンの漁船',desc:'衛星測位で漁場記録と安全航行を両立。'}] },
-  { name:'インドネシア上空', flag:'🇮🇩', lat:[-10,5],    lon:[95,141],   events:[] },
-  { name:'オーストラリア上空',flag:'🇦🇺', lat:[-40,-10],  lon:[110,155],  events:[{icon:'🌾',title:'精密農業',desc:'QZSS信号圏内。自動運転農機が増加中。'}] },
+  { name:'韓国上空',flag:'🇰🇷',lat:[33,43],lon:[124,130],events:[{icon:'📡',title:'東アジアの測位補強',desc:'みちびきの信号は周辺地域の測位精度も向上させている。'}] },
+  { name:'台湾上空',flag:'🇹🇼',lat:[21,26],lon:[119,123],events:[] },
+  { name:'中国東部上空',flag:'🇨🇳',lat:[20,45],lon:[105,125],events:[] },
+  { name:'フィリピン上空',flag:'🇵🇭',lat:[5,20],lon:[117,127],events:[{icon:'⛵',title:'フィリピンの漁船',desc:'衛星測位で漁場記録と安全航行を両立。'}] },
+  { name:'インドネシア上空',flag:'🇮🇩',lat:[-10,5],lon:[95,141],events:[] },
+  { name:'オーストラリア上空',flag:'🇦🇺',lat:[-40,-10],lon:[110,155],events:[{icon:'🌾',title:'精密農業',desc:'QZSS信号圏内。自動運転農機が増加中。'}] },
 ];
 
-function haversineKm(lat1, lon1, lat2, lon2) {
-  const R = 6371;
-  const dLat = (lat2 - lat1) * Math.PI / 180;
-  const dLon = (lon2 - lon1) * Math.PI / 180;
-  const a = Math.sin(dLat/2)**2 + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)**2;
-  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+// ========== RARITY ==========
+const RARITY_SSR_POINTS = [
+  [24.29,153.98,'南鳥島'],
+  [20.42,136.08,'沖ノ鳥島'],
+  [30.48,140.30,'硫黄島'],
+];
+const RARITY_SR_POINTS = [
+  [35.36,138.73,'富士山付近'],
+  [30.37,130.66,'屋久島'],
+  [27.09,142.19,'小笠原'],
+  [26.33,127.80,'沖縄'],
+];
+const RARITY_R_CITIES = ['東京','大阪','名古屋','札幌','福岡・博多','仙台','広島','京都','横浜','神戸'];
+
+function calcRarity(nadirName) {
+  for (const p of RARITY_SSR_POINTS) { if (nadirName.includes(p[2])) return 'SSR'; }
+  for (const p of RARITY_SR_POINTS) { if (nadirName.includes(p[2])) return 'SR'; }
+  for (const c of RARITY_R_CITIES) { if (nadirName.includes(c)) return 'R'; }
+  return 'N';
 }
 
-function reverseGeocode(lat, lon) {
-  while (lon > 180) lon -= 360;
-  while (lon < -180) lon += 360;
+const RARITY_LABELS = { N:'COMMON', R:'RARE', SR:'SUPER RARE', SSR:'ULTRA RARE' };
+const RARITY_STARS = { N:'★', R:'★★★ RARE', SR:'★★★★ SUPER RARE', SSR:'★★★★★ ULTRA RARE' };
+const RARITY_FLAVOR = {
+  N: ['大海原の引き継ぎ','赤道を越えて','静かな交代劇'],
+  R: ['都会の空の引き継ぎ','ビル群を見下ろして','賑やかな街の上で'],
+  SR: ['富士山が見える引き継ぎ','世界遺産の上空で','特別な場所での交代'],
+  SSR: ['伝説の座標での引き継ぎ','最果ての地で','奇跡の瞬間'],
+};
 
-  // 1) 日本の陸地: 最近傍200km以内
-  let bestDist = Infinity, bestPt = null;
-  for (const p of JP_POINTS) {
-    const d = haversineKm(lat, lon, p[0], p[1]);
-    if (d < bestDist) { bestDist = d; bestPt = p; }
-  }
-  if (bestPt && bestDist <= JP_RADIUS_KM) {
-    return { name: bestPt[2] + '上空', flag: '🇯🇵', events: bestPt[3] || [] };
-  }
-
-  // 2) 海域: 最近傍500km以内
-  let seaDist = Infinity, seaPt = null;
-  for (const p of SEA_POINTS) {
-    const d = haversineKm(lat, lon, p[0], p[1]);
-    if (d < seaDist) { seaDist = d; seaPt = p; }
-  }
-  if (seaPt && seaDist <= 500) {
-    return { name: seaPt[2] + '上空', flag: '🌊', events: seaPt[3] || [] };
-  }
-
-  // 3) 海外: bounding box
-  for (const r of OVERSEAS_REGIONS) {
-    if (lat >= r.lat[0] && lat <= r.lat[1] && lon >= r.lon[0] && lon <= r.lon[1]) {
-      return { name: r.name, flag: r.flag, events: r.events || [] };
-    }
-  }
-
-  // 4) フォールバック: 座標
-  const ns = lat >= 0 ? 'N' : 'S';
-  const ew = lon >= 0 ? 'E' : 'W';
-  return { name: `${Math.abs(lat).toFixed(1)}°${ns} ${Math.abs(lon).toFixed(1)}°${ew} 付近`, flag: '🌏', events: [] };
-}
+// ========== HANDOFF CONVERSATIONS ==========
+const HANDOFF_CONVOS = {
+  'qzs2_qzs4': [
+    [{who:'qzs2',line:'…交代だ。'},{who:'qzs4',line:'ニーちゃんおつかれー！ヨンちゃんの出番だね！'},{who:'qzs2',line:'…騒がしいな。頼んだ。'},{who:'qzs4',line:'任せて！今日も日本キレイに見守るよ！'}],
+    [{who:'qzs2',line:'…引き継ぐ。異常なし。'},{who:'qzs4',line:'了解！あ、ニーちゃん今日もかっこいい〜'},{who:'qzs2',line:'…。'},{who:'qzs4',line:'照れてる照れてる！じゃあね〜！'}],
+  ],
+  'qzs4_qzs2': [
+    [{who:'qzs4',line:'ニーちゃーん！交代だよ〜！'},{who:'qzs2',line:'…ああ。ご苦労。'},{who:'qzs4',line:'夜景きれいだったよ！写真撮ってあげたかった！'},{who:'qzs2',line:'…信号の記録で十分だ。'}],
+    [{who:'qzs4',line:'バトンタッチ！今日もがんばったよ、ヨンちゃん！'},{who:'qzs2',line:'…報告は。'},{who:'qzs4',line:'全部順調！みんなの位置、ばっちり届けたよ！'},{who:'qzs2',line:'…了解。休め。'}],
+  ],
+  'qzs2_qzs1r': [
+    [{who:'qzs2',line:'…いちあーる、交代だ。'},{who:'qzs1r',line:'了解しました！引き継ぎます！'},{who:'qzs2',line:'…気負うな。いつも通りやれ。'},{who:'qzs1r',line:'はい…！初号機の分まで、しっかりやります！'}],
+    [{who:'qzs2',line:'…お前に任せる。'},{who:'qzs1r',line:'ニーちゃん先輩…！必ずやり遂げます！'},{who:'qzs2',line:'…わかってる。だから任せる。'},{who:'qzs1r',line:'…ありがとうございますっ！'}],
+  ],
+  'qzs1r_qzs2': [
+    [{who:'qzs1r',line:'ニーちゃん先輩、交代お願いします！'},{who:'qzs2',line:'…ああ。状況は。'},{who:'qzs1r',line:'異常なしです！全信号、確実に送信しました！'},{who:'qzs2',line:'…上出来だ。'}],
+    [{who:'qzs1r',line:'報告します！任務完了です！'},{who:'qzs2',line:'…毎回そんなに力むな。'},{who:'qzs1r',line:'す、すみません…でもちゃんとやりたくて…！'},{who:'qzs2',line:'…わかってる。いい仕事だった。'}],
+  ],
+  'qzs4_qzs1r': [
+    [{who:'qzs4',line:'いちあーるくん！次よろしくね！'},{who:'qzs1r',line:'はい！引き継ぎます！'},{who:'qzs4',line:'真面目だな〜。もうちょっと楽しんでいいのに！'},{who:'qzs1r',line:'楽しんでます…！軌道を守ることが楽しいんですっ！'}],
+    [{who:'qzs4',line:'おつかれヨンちゃん！バトンタッチ〜'},{who:'qzs1r',line:'ヨンちゃん先輩、お疲れ様です！'},{who:'qzs4',line:'先輩って呼ばなくていいのに〜。じゃ、あとはよろしく！'},{who:'qzs1r',line:'了解です！初号機の名に恥じないよう頑張ります！'}],
+  ],
+  'qzs1r_qzs4': [
+    [{who:'qzs1r',line:'ヨンちゃん先輩、交代をお願いしますっ！'},{who:'qzs4',line:'はーい！いちあーるくんお疲れさま〜！'},{who:'qzs1r',line:'少し…疲れました。でもやりきりました！'},{who:'qzs4',line:'えらいえらい！ゆっくり休んでね〜！'}],
+    [{who:'qzs1r',line:'任務完了、引き継ぎます！'},{who:'qzs4',line:'おっ、今日もピシッとしてるね！'},{who:'qzs1r',line:'当然です…！信号を途切れさせるわけにはいきません！'},{who:'qzs4',line:'かっこいい〜！じゃ、ヨンちゃんもがんばるね！'}],
+  ],
+};
 
 // ========== STATE ==========
 let satRecs = {};
 let observer = { lat: 35.6812, lon: 139.7671, alt: 0.04 };
-let selectedSatId = null;
+let oshiSatId = localStorage.getItem('orbit-diary-oshi') || null;
 let tleSource = 'fallback';
 let tleEpoch = '';
+let lastDutyId = null;
+let handoffEvent = null; // { from, to, time, nadir, convo, rarity, flavor, cardNo }
+let handoffFadeTimer = null;
+let currentPage = 'home';
+let cardCollection = JSON.parse(localStorage.getItem('orbit-diary-cards') || '[]');
 
 // ========== TLE FETCH ==========
 async function fetchTLEs() {
   const st = document.getElementById('loadingStatus');
-
-  // Primary: group fetch
   try {
     st.textContent = 'CelesTrak MICHIBIKI...';
     const r = await fetch('https://celestrak.org/NORAD/elements/gp.php?NAME=MICHIBIKI&FORMAT=tle',
@@ -676,7 +778,6 @@ async function fetchTLEs() {
     }
   } catch(_){}
 
-  // Fallback: individual CATNR
   for (const s of SATS) {
     try {
       st.textContent = `${s.name}...`;
@@ -687,7 +788,6 @@ async function fetchTLEs() {
   }
   if (Object.keys(satRecs).length > 0) { tleSource = 'celestrak-individual'; return true; }
 
-  // Last resort: hardcoded
   st.textContent = 'Fallback TLE...';
   loadFallbackTLEs();
   return false;
@@ -707,7 +807,6 @@ function parseTLE(text) {
   const lines = text.trim().split('\n').map(l => l.trim()).filter(l => l);
   let found = 0;
   for (let i = 0; i < lines.length;) {
-    // Skip name lines
     if (!lines[i].startsWith('1 ')) { i++; continue; }
     const t1 = lines[i]; i++;
     if (i >= lines.length || !lines[i].startsWith('2 ')) continue;
@@ -726,7 +825,48 @@ function parseTLE(text) {
   return found > 0;
 }
 
-// ========== POSITION CALCULATION ==========
+// ========== POSITION ==========
+function haversineKm(lat1, lon1, lat2, lon2) {
+  const R = 6371;
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLon = (lon2 - lon1) * Math.PI / 180;
+  const a = Math.sin(dLat/2)**2 + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)**2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+}
+
+function reverseGeocode(lat, lon) {
+  while (lon > 180) lon -= 360;
+  while (lon < -180) lon += 360;
+
+  let bestDist = Infinity, bestPt = null;
+  for (const p of JP_POINTS) {
+    const d = haversineKm(lat, lon, p[0], p[1]);
+    if (d < bestDist) { bestDist = d; bestPt = p; }
+  }
+  if (bestPt && bestDist <= JP_RADIUS_KM) {
+    return { name: bestPt[2] + '上空', flag: '🇯🇵', events: bestPt[3] || [] };
+  }
+
+  let seaDist = Infinity, seaPt = null;
+  for (const p of SEA_POINTS) {
+    const d = haversineKm(lat, lon, p[0], p[1]);
+    if (d < seaDist) { seaDist = d; seaPt = p; }
+  }
+  if (seaPt && seaDist <= 500) {
+    return { name: seaPt[2] + '上空', flag: '🌊', events: seaPt[3] || [] };
+  }
+
+  for (const r of OVERSEAS_REGIONS) {
+    if (lat >= r.lat[0] && lat <= r.lat[1] && lon >= r.lon[0] && lon <= r.lon[1]) {
+      return { name: r.name, flag: r.flag, events: r.events || [] };
+    }
+  }
+
+  const ns = lat >= 0 ? 'N' : 'S';
+  const ew = lon >= 0 ? 'E' : 'W';
+  return { name: `${Math.abs(lat).toFixed(1)}\u00B0${ns} ${Math.abs(lon).toFixed(1)}\u00B0${ew} 付近`, flag: '🌏', events: [] };
+}
+
 function calcPos(rec, date) {
   const pv = satellite.propagate(rec.satrec, date);
   if (!pv.position) return null;
@@ -740,11 +880,11 @@ function calcPos(rec, date) {
   const ecf = satellite.eciToEcf(pv.position, gmst);
   const la = satellite.ecfToLookAngles(obsGeo, ecf);
   return {
-    lat:   satellite.degreesLat(geo.latitude),
-    lon:   satellite.degreesLong(geo.longitude),
-    alt:   geo.height,
-    az:    satellite.radiansToDegrees(la.azimuth),
-    el:    satellite.radiansToDegrees(la.elevation),
+    lat: satellite.degreesLat(geo.latitude),
+    lon: satellite.degreesLong(geo.longitude),
+    alt: geo.height,
+    az:  satellite.radiansToDegrees(la.azimuth),
+    el:  satellite.radiansToDegrees(la.elevation),
     range: la.rangeSat
   };
 }
@@ -763,74 +903,71 @@ function azDir(az) {
   return j[Math.round(az / 22.5) % 16];
 }
 
-// "当番" = highest elevation QZO visible from observer
 function getDuty(positions) {
   return Object.values(positions)
     .filter(p => p.pos && p.def.type === 'QZO' && p.pos.el > 0)
     .sort((a, b) => b.pos.el - a.pos.el)[0] || null;
 }
 
-function getSelected(positions) {
-  if (selectedSatId) {
-    const found = Object.values(positions).find(p => p.def.id === selectedSatId);
+function getOshi(positions) {
+  if (oshiSatId) {
+    const found = Object.values(positions).find(p => p.def.id === oshiSatId);
     if (found) return found;
   }
   return getDuty(positions) || Object.values(positions).find(p => p.pos) || null;
 }
 
-// ========== NARRATIVE (キャラクター×直下点) ==========
-// 性格別テンプレート
+// ========== NARRATIVE ==========
 const VOICE = {
-  cool: { // 2号機：クール寡黙
-    zenith: (n,e) => `…<em>${n}</em>の真上。仰角${e}°。全部届く角度。…やることはやる。`,
-    high: (n,e,d) => `<em>${n}</em>、仰角${e}°。${d}方向。…悪くない位置だ。`,
-    mid: (n,e) => `直下点、<em>${n}</em>。仰角${e}°。…まだ見えてる。`,
+  cool: {
+    zenith: (n,e) => `…<em>${n}</em>の真上。仰角${e}\u00B0。全部届く角度。…やることはやる。`,
+    high: (n,e,d) => `<em>${n}</em>、仰角${e}\u00B0。${d}方向。…悪くない位置だ。`,
+    mid: (n,e) => `直下点、<em>${n}</em>。仰角${e}\u00B0。…まだ見えてる。`,
     low: (n,d) => `${d}の空、低い。…次の奴に任せる。`,
     hidden: (n,a) => `日本からは見えない。<em>${n}</em>の高度${a}kmにいる。…少し休む。`,
-    geoVis: (n,e,d) => `…ここにいる。ずっと。<em>${n}</em>、仰角${e}°、${d}。`,
+    geoVis: (n,e,d) => `…ここにいる。ずっと。<em>${n}</em>、仰角${e}\u00B0、${d}。`,
     geoHid: (n) => `<em>${n}</em>。地平線の下。…でも仕事はしてる。`,
   },
-  genki: { // 4号機：元気アイドル
-    zenith: (n,e) => `きたきた！<em>${n}</em>のほぼ真上！仰角${e}°！最高のポジション！みんなー、ヨンちゃんが見守ってるよー！`,
-    high: (n,e,d) => `<em>${n}</em>通過中〜！仰角${e}°、${d}のほう！けっこう高い位置にいるよ！地上の形がよく見える！`,
-    mid: (n,e) => `いま<em>${n}</em>の上にいるよ！仰角${e}°！8の字ルート楽しい〜！`,
+  genki: {
+    zenith: (n,e) => `きたきた！<em>${n}</em>のほぼ真上！仰角${e}\u00B0！最高のポジション！みんなー、ヨンちゃんが見守ってるよー！`,
+    high: (n,e,d) => `<em>${n}</em>通過中〜！仰角${e}\u00B0、${d}のほう！けっこう高い位置にいるよ！地上の形がよく見える！`,
+    mid: (n,e) => `いま<em>${n}</em>の上にいるよ！仰角${e}\u00B0！8の字ルート楽しい〜！`,
     low: (n,d) => `ん〜、ちょっと低くなってきちゃった。${d}のほう。でもまだがんばる！`,
     hidden: (n,a) => `いまね、<em>${n}</em>のあたり、高度${a}kmを旅してるの。日本からは見えないけど、すぐ戻るから待っててね！`,
-    geoVis: (n,e,d) => `いつもの場所にいるよ〜。<em>${n}</em>、仰角${e}°！ずっとここで見守ってる！`,
+    geoVis: (n,e,d) => `いつもの場所にいるよ〜。<em>${n}</em>、仰角${e}\u00B0！ずっとここで見守ってる！`,
     geoHid: (n) => `あれ〜、そっちからは見えない位置？ でも<em>${n}</em>からみんなのこと見てるよ！`,
   },
-  earnest: { // 1R：真面目・熱い
-    zenith: (n,e) => `報告します。<em>${n}</em>直上、仰角${e}°。最適な測位角度を維持中。初号機から受け継いだこの軌道、しっかり守ります！`,
-    high: (n,e,d) => `<em>${n}</em>上空、仰角${e}°、${d}方向。8の字軌道、予定通り。先代の分まで、確実にカバーしていきます。`,
-    mid: (n,e) => `直下点<em>${n}</em>。仰角${e}°。まだ日本を見守れる位置です。気を抜きません。`,
+  earnest: {
+    zenith: (n,e) => `報告します。<em>${n}</em>直上、仰角${e}\u00B0。最適な測位角度を維持中。初号機から受け継いだこの軌道、しっかり守ります！`,
+    high: (n,e,d) => `<em>${n}</em>上空、仰角${e}\u00B0、${d}方向。8の字軌道、予定通り。先代の分まで、確実にカバーしていきます。`,
+    mid: (n,e) => `直下点<em>${n}</em>。仰角${e}\u00B0。まだ日本を見守れる位置です。気を抜きません。`,
     low: (n,d) => `仰角が下がってきました、${d}方向。…でもまだ信号は届きます。最後まで全力です。`,
     hidden: (n,a) => `現在、<em>${n}</em>付近、高度${a}km。日本からは見えない位置ですが…8の字の南側も、大事な軌道の一部です。必ず戻ります。`,
-    geoVis: (n,e,d) => `静止軌道、<em>${n}</em>。仰角${e}°、${d}方向。ここからずっと見守っています。それが自分の任務です。`,
+    geoVis: (n,e,d) => `静止軌道、<em>${n}</em>。仰角${e}\u00B0、${d}方向。ここからずっと見守っています。それが自分の任務です。`,
     geoHid: (n) => `<em>${n}</em>。この観測地からは見えませんが…任務は続いています。`,
   },
-  calm: { // 3号機：穏やか・お姉さん
-    zenith: (n,e) => `ふふ、<em>${n}</em>の真上ね。仰角${e}°。いつもの場所から、いつも通り。安心してね。`,
-    high: (n,e,d) => `<em>${n}</em>、仰角${e}°。${d}のほうにいるわ。今日も穏やかね。お茶でも飲みながら見守ってるわ。`,
-    mid: (n,e) => `直下点は<em>${n}</em>。仰角${e}°。まぁまぁ、ちゃんと見えてるから大丈夫よ。`,
+  calm: {
+    zenith: (n,e) => `ふふ、<em>${n}</em>の真上ね。仰角${e}\u00B0。いつもの場所から、いつも通り。安心してね。`,
+    high: (n,e,d) => `<em>${n}</em>、仰角${e}\u00B0。${d}のほうにいるわ。今日も穏やかね。お茶でも飲みながら見守ってるわ。`,
+    mid: (n,e) => `直下点は<em>${n}</em>。仰角${e}\u00B0。まぁまぁ、ちゃんと見えてるから大丈夫よ。`,
     low: (n,d) => `あら、${d}の空ね。少し低いけど…まぁ、こういう日もあるわ。`,
     hidden: (n,a) => `<em>${n}</em>、高度${a}km。そっちからは見えないかしら。でも心配しないで、ちゃんとここにいるから。`,
-    geoVis: (n,e,d) => `いつもの場所よ。<em>${n}</em>、仰角${e}°。動かないのが私の取り柄。QZOの子たちが忙しく交代してる間も、ずっとここにいるわ。`,
+    geoVis: (n,e,d) => `いつもの場所よ。<em>${n}</em>、仰角${e}\u00B0。動かないのが私の取り柄。QZOの子たちが忙しく交代してる間も、ずっとここにいるわ。`,
     geoHid: (n) => `<em>${n}</em>ね。見えない場所だけど…大丈夫、ちゃんと信号は届けてるわ。`,
   },
-  shy: { // 6号機：新人・おどおど
-    zenith: (n,e) => `あ、あの…<em>${n}</em>の真上にいます…！仰角${e}°です…！ちゃんとできてますか…？`,
-    high: (n,e,d) => `<em>${n}</em>の上です…仰角${e}°、${d}のほう…。えっと、信号はちゃんと出てると思います…たぶん…。`,
-    mid: (n,e) => `直下点は<em>${n}</em>で…仰角${e}°です…。が、がんばってます…！`,
+  shy: {
+    zenith: (n,e) => `あ、あの…<em>${n}</em>の真上にいます…！仰角${e}\u00B0です…！ちゃんとできてますか…？`,
+    high: (n,e,d) => `<em>${n}</em>の上です…仰角${e}\u00B0、${d}のほう…。えっと、信号はちゃんと出てると思います…たぶん…。`,
+    mid: (n,e) => `直下点は<em>${n}</em>で…仰角${e}\u00B0です…。が、がんばってます…！`,
     low: (n,d) => `す、すみません…${d}のほうで、ちょっと低くなっちゃいました…。でもまだ信号出してます…！`,
     hidden: (n,a) => `あの…いま<em>${n}</em>の高度${a}kmにいます…見えない位置ですみません…。でもさんちゃん先輩がカバーしてくれてるはずです…！`,
-    geoVis: (n,e,d) => `あ…<em>${n}</em>にいます…仰角${e}°、${d}です…。さんちゃん先輩のとなりで、がんばってます…。`,
+    geoVis: (n,e,d) => `あ…<em>${n}</em>にいます…仰角${e}\u00B0、${d}です…。さんちゃん先輩のとなりで、がんばってます…。`,
     geoHid: (n) => `あの…<em>${n}</em>です…見えない位置ですみません…。でも信号はちゃんと出してます…！`,
   },
 };
 
 function narrative(def, pos, hour) {
   if (!pos) return { text: 'データ計算中...', event: null, nadir: null };
-
   const el = pos.el.toFixed(1);
   const dir = azDir(pos.az);
   const alt = Math.round(pos.alt).toLocaleString();
@@ -849,12 +986,10 @@ function narrative(def, pos, hour) {
     else            text = v.geoHid(nadir.name);
   }
 
-  // Ground event
   let ev = null;
   if (nadir.events && nadir.events.length > 0) {
     ev = nadir.events[hour % nadir.events.length];
   }
-
   return { text, event: ev, nadir };
 }
 
@@ -870,7 +1005,6 @@ function drawSky(canvas, positions) {
   const cx = w / 2, cy = h / 2, r = Math.min(cx, cy) - 18;
   ctx.clearRect(0, 0, w, h);
 
-  // Elevation rings
   [0, 30, 60].forEach(e => {
     const rr = r * (1 - e / 90);
     ctx.beginPath(); ctx.arc(cx, cy, rr, 0, Math.PI * 2);
@@ -878,14 +1012,12 @@ function drawSky(canvas, positions) {
     if (e > 0) {
       ctx.fillStyle = 'rgba(255,255,255,0.12)';
       ctx.font = '8px Space Mono'; ctx.textAlign = 'center';
-      ctx.fillText(e + '°', cx, cy - rr + 10);
+      ctx.fillText(e + '\u00B0', cx, cy - rr + 10);
     }
   });
-  // Zenith dot
   ctx.beginPath(); ctx.arc(cx, cy, 2, 0, Math.PI * 2);
   ctx.fillStyle = 'rgba(255,255,255,0.15)'; ctx.fill();
 
-  // Cardinal directions
   [{l:'N',a:-90},{l:'E',a:0},{l:'S',a:90},{l:'W',a:180}].forEach(d => {
     const rad = d.a * Math.PI / 180;
     ctx.beginPath(); ctx.moveTo(cx, cy);
@@ -896,8 +1028,7 @@ function drawSky(canvas, positions) {
     ctx.fillText(d.l, cx + (r + 12) * Math.cos(rad), cy + (r + 12) * Math.sin(rad));
   });
 
-  // Plot each satellite
-  const sel = getSelected(positions);
+  const oshi = getOshi(positions);
   Object.values(positions).forEach(({pos, def}) => {
     if (!pos || pos.el < -10) return;
     const vis = pos.el > 0;
@@ -905,9 +1036,8 @@ function drawSky(canvas, positions) {
     const azRad = (pos.az - 90) * Math.PI / 180;
     const sx = cx + dist * Math.cos(azRad);
     const sy = cy + dist * Math.sin(azRad);
-    const isSel = sel && sel.def.id === def.id;
+    const isOshi = oshi && oshi.def.id === def.id;
 
-    // Glow for high-elevation
     if (vis && pos.el > 50) {
       ctx.beginPath(); ctx.arc(sx, sy, 18, 0, Math.PI * 2);
       const g = ctx.createRadialGradient(sx, sy, 0, sx, sy, 18);
@@ -915,189 +1045,364 @@ function drawSky(canvas, positions) {
       ctx.fillStyle = g; ctx.fill();
     }
 
-    // Dot
-    const dotR = isSel ? 7 : (vis ? 5 : 3);
+    const dotR = isOshi ? 7 : (vis ? 5 : 3);
     ctx.beginPath(); ctx.arc(sx, sy, dotR, 0, Math.PI * 2);
     ctx.fillStyle = vis ? def.color : def.cd + '0.3)';
     ctx.fill();
 
     if (vis) {
       ctx.beginPath(); ctx.arc(sx, sy, dotR + 3, 0, Math.PI * 2);
-      ctx.strokeStyle = def.cd + (isSel ? '0.5)' : '0.2)');
-      ctx.lineWidth = isSel ? 1.5 : 1; ctx.stroke();
+      ctx.strokeStyle = def.cd + (isOshi ? '0.5)' : '0.2)');
+      ctx.lineWidth = isOshi ? 1.5 : 1; ctx.stroke();
     }
 
-    // Label
     ctx.fillStyle = vis ? def.color : def.cd + '0.4)';
-    ctx.font = `bold ${isSel ? '11' : '9'}px Space Mono`;
+    ctx.font = `bold ${isOshi ? '11' : '9'}px Space Mono`;
     ctx.textAlign = 'center';
     ctx.fillText(def.short, sx, sy - dotR - 5);
 
-    // Elevation for selected
-    if (isSel && vis) {
+    if (isOshi && vis) {
       ctx.fillStyle = def.cd + '0.7)';
       ctx.font = '8px Space Mono';
-      ctx.fillText(pos.el.toFixed(1) + '°', sx, sy + dotR + 10);
+      ctx.fillText(pos.el.toFixed(1) + '\u00B0', sx, sy + dotR + 10);
     }
   });
 }
 
+// ========== HANDOFF DETECTION ==========
+function checkHandoff(positions, now) {
+  const duty = getDuty(positions);
+  const currentDutyId = duty ? duty.def.id : null;
+
+  if (lastDutyId === null) {
+    lastDutyId = currentDutyId;
+    return;
+  }
+
+  if (currentDutyId && currentDutyId !== lastDutyId) {
+    const fromDef = SATS.find(s => s.id === lastDutyId);
+    const toDef = SATS.find(s => s.id === currentDutyId);
+    if (fromDef && toDef) {
+      const fromPos = Object.values(positions).find(p => p.def.id === lastDutyId);
+      const toPos = Object.values(positions).find(p => p.def.id === currentDutyId);
+      const nadirFrom = fromPos && fromPos.pos ? reverseGeocode(fromPos.pos.lat, fromPos.pos.lon) : null;
+      const nadirTo = toPos && toPos.pos ? reverseGeocode(toPos.pos.lat, toPos.pos.lon) : null;
+
+      // Pick conversation
+      const key1 = `${lastDutyId}_${currentDutyId}`;
+      const key2 = `${currentDutyId}_${lastDutyId}`;
+      const convos = HANDOFF_CONVOS[key1] || HANDOFF_CONVOS[key2] || [[
+        {who: lastDutyId, line: '交代だ。あとは頼む。'},
+        {who: currentDutyId, line: '了解、引き継ぎます！'},
+      ]];
+      const convo = convos[Math.floor(Math.random() * convos.length)];
+
+      const nadirName = nadirTo ? nadirTo.name : (nadirFrom ? nadirFrom.name : '太平洋上空');
+      const rarity = calcRarity(nadirName);
+      const flavors = RARITY_FLAVOR[rarity];
+      const flavor = flavors[Math.floor(Math.random() * flavors.length)];
+      const cardNo = cardCollection.length + 1;
+
+      handoffEvent = {
+        from: fromDef,
+        to: toDef,
+        time: now,
+        nadirName,
+        fromEl: fromPos && fromPos.pos ? fromPos.pos.el.toFixed(1) : '?',
+        toEl: toPos && toPos.pos ? toPos.pos.el.toFixed(1) : '?',
+        convo,
+        rarity,
+        flavor,
+        cardNo,
+      };
+
+      // Save QSL card
+      const card = {
+        no: cardNo,
+        from: { id: fromDef.id, emoji: fromDef.emoji, nickname: fromDef.nickname },
+        to: { id: toDef.id, emoji: toDef.emoji, nickname: toDef.nickname },
+        time: now.toISOString(),
+        nadir: nadirName,
+        fromEl: handoffEvent.fromEl,
+        toEl: handoffEvent.toEl,
+        rarity,
+        flavor,
+      };
+      cardCollection.push(card);
+      localStorage.setItem('orbit-diary-cards', JSON.stringify(cardCollection));
+
+      // Auto-clear after 30s
+      if (handoffFadeTimer) clearTimeout(handoffFadeTimer);
+      handoffFadeTimer = setTimeout(() => { handoffEvent = null; }, 30000);
+    }
+  }
+  lastDutyId = currentDutyId;
+}
+
 // ========== UI BUILD ==========
-function buildOshi(positions) {
+function buildOshiHero(positions, now) {
+  const el = document.getElementById('oshiHero');
+  const entry = getOshi(positions);
+  if (!entry) { el.innerHTML = ''; return; }
+  const { pos, def } = entry;
+  const duty = getDuty(positions);
+  const isDuty = duty && duty.def.id === def.id;
+
+  el.innerHTML = `
+    <div class="oshi-hero-emoji">${def.emoji}</div>
+    <div class="oshi-hero-name" style="color:${def.color};">${def.nickname}</div>
+    <div class="oshi-hero-status ${isDuty ? 'on-duty' : 'off-duty'}">
+      ${isDuty ? '\u5F53\u756A\u4E2D \uD83D\uDC51' : (pos && pos.el > 0 ? '\u8996\u91CE\u5185' : '\u4F11\u61A9\u4E2D \uD83D\uDCA4')}
+    </div>
+  `;
+}
+
+function buildSpeechBubble(positions, now) {
+  const wrap = document.getElementById('speechWrap');
+  const entry = getOshi(positions);
+  if (!entry) { wrap.innerHTML = ''; return; }
+  const { pos, def } = entry;
+  const hour = now.getHours();
+  const { text, event } = narrative(def, pos, hour);
+
+  wrap.innerHTML = `
+    <div class="speech-bubble" style="background:${def.cd}0.06);border:1px solid ${def.cd}0.15);">
+      <style>.speech-bubble::before { border-bottom-color: ${def.cd}0.15); }</style>
+      <div>${text}</div>
+      ${event ? `
+        <div class="speech-event">
+          <div class="speech-event-icon">${event.icon}</div>
+          <div class="speech-event-body">
+            <div class="speech-event-title">${event.title}</div>
+            <div class="speech-event-desc">${event.desc}</div>
+          </div>
+        </div>
+      ` : ''}
+    </div>
+  `;
+}
+
+function buildNadir(positions) {
+  const el = document.getElementById('oshiNadir');
+  const entry = getOshi(positions);
+  if (!entry || !entry.pos) { el.innerHTML = ''; return; }
+  const { pos, def } = entry;
+  const nadir = reverseGeocode(pos.lat, pos.lon);
+
+  el.innerHTML = `
+    <span>${nadir.flag} <span class="loc">${nadir.name}</span></span>
+    <span>EL ${pos.el.toFixed(1)}\u00B0 / ${Math.round(pos.alt).toLocaleString()}km</span>
+  `;
+}
+
+function buildOshiBar(positions) {
   const el = document.getElementById('oshiBar');
   const duty = getDuty(positions);
   const sorted = Object.values(positions).filter(p => p).sort((a, b) => (b.pos?.el || 0) - (a.pos?.el || 0));
-  const sel = getSelected(positions);
+  const oshi = getOshi(positions);
 
   el.innerHTML = sorted.map(({pos, def}) => {
     const isDuty = duty && duty.def.id === def.id;
-    const isSel = sel && sel.def.id === def.id;
+    const isOshi = oshi && oshi.def.id === def.id;
     const vis = pos && pos.el > 0;
-    // Mood based on elevation
-    const mood = !pos ? '' : pos.el > 70 ? '🔥' : pos.el > 30 ? '😊' : pos.el > 0 ? '🙂' : '💤';
     return `
-      <div class="oshi-chip sat-${def.cls}${isSel ? ' selected' : ''}${isDuty ? ' on-duty' : ''}" onclick="selectSat('${def.id}')">
-        <div class="oshi-avatar" style="font-size:20px;">
+      <div class="oshi-chip sat-${def.cls}${isOshi ? ' selected' : ''}${isDuty ? ' on-duty' : ''}" onclick="setOshi('${def.id}')">
+        <div class="oshi-avatar">
           ${def.emoji}
-          <div class="oshi-elev" style="color:${vis ? def.color : 'var(--text-dim)'}">${pos ? (vis ? pos.el.toFixed(0) + '°' : '▼') : '...'}</div>
+          <div class="oshi-elev" style="color:${vis ? def.color : 'var(--text-dim)'}">${pos ? (vis ? pos.el.toFixed(0) + '\u00B0' : '\u25BC') : '...'}</div>
         </div>
-        <div class="oshi-name">${def.nickname || def.short}</div>
+        <div class="oshi-name">${def.nickname}</div>
       </div>`;
   }).join('');
 }
 
-function buildProfile(positions) {
-  const el = document.getElementById('profileCard');
-  const entry = getSelected(positions);
-  if (!entry) { el.innerHTML = ''; return; }
-  const {pos, def} = entry;
-  const duty = getDuty(positions);
-  const isDuty = duty && duty.def.id === def.id;
-  const vis = pos && pos.el > 0;
-  const isSel = selectedSatId === def.id;
-
-  el.style.background = `linear-gradient(135deg, ${def.cd}0.07), transparent)`;
-  el.style.border = `1px solid ${def.cd}0.15)`;
-
-  const nadir = pos ? reverseGeocode(pos.lat, pos.lon) : null;
+function buildHandoffCard() {
+  const el = document.getElementById('handoffCard');
+  if (!handoffEvent) { el.innerHTML = ''; return; }
+  const h = handoffEvent;
+  const timeStr = h.time.toLocaleTimeString('ja-JP');
 
   el.innerHTML = `
-    <div class="profile-top-row">
-      <div class="profile-identity">
-        <div class="profile-avatar" style="background:${def.cd}0.15);border:2px solid ${def.cd}0.35);color:${def.color};font-size:22px;">${def.emoji}</div>
-        <div>
-          <div class="profile-name" style="color:${def.color};">${def.nickname || def.name}${isDuty ? ' 👑' : ''}</div>
-          <div class="profile-sub">${def.name} / ${def.type} / ${def.launched}打上げ</div>
-        </div>
+    <div class="handoff-card">
+      <div class="handoff-label">HANDOFF</div>
+      <div class="handoff-pair">
+        <span>${h.from.emoji}</span>
+        <span class="handoff-arrow">\u2192</span>
+        <span>${h.to.emoji}</span>
       </div>
-      <button class="oshi-btn${isSel ? ' is-oshi' : ''}" style="${isSel ? `background:${def.cd}0.12);color:${def.color};border-color:${def.cd}0.3)` : ''}" onclick="toggleOshi('${def.id}')">
-        ${isSel ? '推し ✓' : '推す'}
-      </button>
-    </div>
-    <div class="profile-grid">
-      <div class="pg-item"><div class="pg-val" style="color:${vis ? def.color : 'var(--text-dim)'}">${pos ? pos.el.toFixed(1) + '°' : '---'}</div><div class="pg-label">仰角</div></div>
-      <div class="pg-item"><div class="pg-val" style="color:var(--text)">${pos ? azDir(pos.az) : '---'}</div><div class="pg-label">方位</div></div>
-      <div class="pg-item"><div class="pg-val" style="color:var(--text)">${pos ? Math.round(pos.alt).toLocaleString() : '---'}</div><div class="pg-label">高度km</div></div>
-      <div class="pg-item"><div class="pg-val" style="color:var(--text)">${pos ? Math.round(pos.range).toLocaleString() : '---'}</div><div class="pg-label">距離km</div></div>
-    </div>
-    <div class="profile-bio"><em style="color:${def.color}">${def.bio}</em></div>
-    ${nadir ? `<div style="margin-top:10px;padding:8px 12px;background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:10px;">
-      <div style="font-size:10px;color:var(--text-dim);margin-bottom:4px;font-family:'Space Mono';">📌 直下点（真下の地表）</div>
-      <div style="font-size:13px;font-weight:500;">${nadir.flag} ${nadir.name}</div>
-      <div style="font-size:10px;color:var(--text-dim);font-family:'Space Mono';margin-top:2px;">${pos.lat.toFixed(3)}°${pos.lat > 0 ? 'N' : 'S'}, ${pos.lon.toFixed(3)}°${pos.lon > 0 ? 'E' : 'W'} / 高度${Math.round(pos.alt).toLocaleString()}km</div>
-    </div>` : ''}
-  `;
-}
-
-function buildDiary(positions, now) {
-  const el = document.getElementById('diarySection');
-  const entry = getSelected(positions);
-  if (!entry) { el.innerHTML = ''; return; }
-  const {pos, def} = entry;
-  const hour = now.getHours();
-  const { text, event, nadir } = narrative(def, pos, hour);
-  const duty = getDuty(positions);
-  const isDuty = duty && duty.def.id === def.id;
-  const nadirLabel = nadir ? `${nadir.flag} ${nadir.name}` : '';
-
-  // Deterministic heart count based on elevation
-  const hearts = pos ? Math.max(0, Math.floor(pos.el * 50 + 500)) : 100;
-  // Deterministic comment/share counts based on satellite NORAD + hour
-  const seed = def.norad + hour;
-  const comments = 50 + (seed * 7) % 200;
-  const shares = 100 + (seed * 13) % 500;
-
-  el.innerHTML = `
-    <div class="diary-section-title">${def.emoji} ${def.nickname || def.name}のつぶやき</div>
-    <div class="diary-post">
-      <div class="post-header">
-        <div class="post-avatar" style="background:${def.cd}0.15);border:1.5px solid ${def.cd}0.3);font-size:14px;">${def.emoji}</div>
-        <div class="post-meta">
-          <div class="post-author" style="color:${def.color};">${def.nickname || def.name} <span style="font-size:10px;color:var(--text-dim);font-weight:400;">@${def.id}</span></div>
-          <div class="post-time">${now.toLocaleTimeString('ja-JP')} JST${isDuty ? ' — 👑当番中' : ''}</div>
-        </div>
+      <div class="handoff-names">${h.from.nickname} \u2192 ${h.to.nickname}</div>
+      <div style="font-size:10px;color:var(--text-dim);text-align:center;font-family:'Space Mono',monospace;">
+        ${timeStr} JST / ${h.nadirName}
       </div>
-      ${nadirLabel ? `<div style="padding:6px 14px 0;font-size:11px;color:var(--text-dim);">📌 直下点: <span style="color:var(--text-sub);font-weight:500;">${nadirLabel}</span> <span style="font-family:'Space Mono';font-size:9px;">(${pos.lat.toFixed(2)}°${pos.lat > 0 ? 'N' : 'S'}, ${pos.lon.toFixed(2)}°${pos.lon > 0 ? 'E' : 'W'})</span></div>` : ''}
-      <div class="post-body">${text}</div>
-      ${event ? `
-        <div class="post-event">
-          <div class="pe-icon">${event.icon}</div>
-          <div class="pe-body">
-            <div class="pe-title">${event.title}</div>
-            <div class="pe-desc">${event.desc}</div>
-          </div>
-        </div>
-      ` : ''}
-      <div class="post-footer">
-        <div class="pf-action liked">♥ ${hearts.toLocaleString()}</div>
-        <div class="pf-action">💬 ${comments}</div>
-        <div class="pf-action">🔄 ${shares}</div>
+      <div class="handoff-convo">
+        ${h.convo.map(line => {
+          const who = SATS.find(s => s.id === line.who);
+          return `<div class="handoff-line"><em style="color:${who ? who.color : 'var(--text)'}">${who ? who.emoji + ' ' + who.nickname : line.who}:</em> ${line.line}</div>`;
+        }).join('')}
+      </div>
+      <div style="text-align:center;margin-top:10px;">
+        <span class="qsl-rarity qsl-rarity-${h.rarity.toLowerCase()}">${RARITY_STARS[h.rarity]}</span>
+        <div style="font-size:9px;color:var(--text-dim);margin-top:4px;">QSL No.${String(h.cardNo).padStart(4,'0')} \u2014 "${h.flavor}"</div>
       </div>
     </div>
   `;
 }
 
-function buildSatsList(positions) {
-  const el = document.getElementById('satsList');
+function buildSatsList(positions, targetId) {
+  const el = document.getElementById(targetId);
   const sorted = Object.values(positions).filter(p => p).sort((a, b) => (b.pos?.el || 0) - (a.pos?.el || 0));
   const duty = getDuty(positions);
-  const sel = getSelected(positions);
 
   el.innerHTML = sorted.map(({pos, def}) => {
     const isDuty = duty && duty.def.id === def.id;
-    const isSel = sel && sel.def.id === def.id;
     const vis = pos && pos.el > 0;
     let stText, stStyle;
-    if (isDuty)                    { stText = '当番中';   stStyle = `background:${def.cd}0.15);color:${def.color};`; }
-    else if (def.type === 'GEO' && vis) { stText = '常駐';   stStyle = `background:${def.cd}0.1);color:${def.color};`; }
-    else if (vis)                  { stText = '視野内';   stStyle = `background:rgba(129,199,132,0.1);color:var(--green);`; }
-    else                           { stText = '地平線下'; stStyle = `background:rgba(255,255,255,0.04);color:var(--text-dim);`; }
+    if (isDuty)                         { stText = '\u5F53\u756A\u4E2D'; stStyle = `background:${def.cd}0.15);color:${def.color};`; }
+    else if (def.type === 'GEO' && vis) { stText = '\u5E38\u99D0';       stStyle = `background:${def.cd}0.1);color:${def.color};`; }
+    else if (vis)                       { stText = '\u8996\u91CE\u5185';  stStyle = `background:rgba(129,199,132,0.1);color:var(--green);`; }
+    else                                { stText = '\u5730\u5E73\u7DDA\u4E0B'; stStyle = `background:rgba(255,255,255,0.04);color:var(--text-dim);`; }
 
     const nadir = pos ? reverseGeocode(pos.lat, pos.lon) : null;
     const nadirStr = nadir ? `${nadir.flag} ${nadir.name}` : '---';
 
     return `
-      <div class="sr${isDuty ? ' is-duty' : ''}${isSel ? ' is-selected' : ''}" onclick="selectSat('${def.id}')" style="cursor:pointer;">
+      <div class="sr${isDuty ? ' is-duty' : ''}" onclick="setOshi('${def.id}')" style="cursor:pointer;">
         <div class="sr-av" style="background:${def.cd}0.12);border:1.5px solid ${def.cd}${vis ? '0.3' : '0.12'});font-size:16px;">${def.emoji}</div>
         <div class="sr-info">
-          <div class="sr-name" style="color:${vis ? def.color : 'var(--text-dim)'};">${def.nickname || def.name}${isDuty ? ' 👑' : ''} <span style="font-size:9px;opacity:0.5;">${def.short}</span></div>
+          <div class="sr-name" style="color:${vis ? def.color : 'var(--text-dim)'};">${def.nickname}${isDuty ? ' \uD83D\uDC51' : ''} <span style="font-size:9px;opacity:0.5;">${def.short}</span></div>
           <div class="sr-sub">${nadirStr} / ${pos ? Math.round(pos.alt).toLocaleString() + 'km' : '---'}</div>
         </div>
         <div class="sr-right">
-          <div class="sr-elev" style="color:${vis ? def.color : 'var(--text-dim)'};">${pos ? pos.el.toFixed(1) + '°' : '---'}</div>
+          <div class="sr-elev" style="color:${vis ? def.color : 'var(--text-dim)'};">${pos ? pos.el.toFixed(1) + '\u00B0' : '---'}</div>
           <div class="sr-status" style="${stStyle}">${stText}</div>
         </div>
       </div>`;
   }).join('');
 }
 
-// ========== INTERACTION ==========
-function selectSat(id) {
-  selectedSatId = (selectedSatId === id) ? null : id;
+function buildCardPreview() {
+  const el = document.getElementById('cardPreview');
+  if (cardCollection.length === 0) { el.innerHTML = ''; return; }
+  const recent = cardCollection.slice(-3).reverse();
+  el.innerHTML = `
+    <div class="section-title">\uD83C\uDFB4 \u30AB\u30FC\u30C9\u30B3\u30EC\u30AF\u30B7\u30E7\u30F3 (${cardCollection.length}\u679A)</div>
+    <div style="display:flex;gap:8px;padding:0 20px 12px;overflow-x:auto;scrollbar-width:none;">
+      ${recent.map(c => renderQSLMini(c)).join('')}
+    </div>
+  `;
 }
 
-function toggleOshi(id) {
-  selectedSatId = id;
+function renderQSLMini(card) {
+  const d = new Date(card.time);
+  const dateStr = `${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`;
+  return `
+    <div class="qsl-card" style="flex-shrink:0;width:160px;transform:rotate(${(card.no % 3 - 1) * 1.5}deg);">
+      <div class="qsl-top">ORBIT DIARY QSL</div>
+      <div class="qsl-divider"></div>
+      <div class="qsl-pair">
+        <span>${card.from.emoji}</span>
+        <span class="qsl-pair-arrow">\u2192</span>
+        <span>${card.to.emoji}</span>
+      </div>
+      <div class="qsl-names">${card.from.nickname} \u2192 ${card.to.nickname}</div>
+      <div class="qsl-time">${dateStr}</div>
+      <div class="qsl-nadir">${card.nadir}</div>
+      <div class="qsl-rarity qsl-rarity-${card.rarity.toLowerCase()}">${RARITY_STARS[card.rarity]}</div>
+      <div class="qsl-number">No.${String(card.no).padStart(4,'0')}</div>
+    </div>
+  `;
+}
+
+function renderQSLFull(card) {
+  const d = new Date(card.time);
+  const dateStr = `${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')} JST`;
+  return `
+    <div class="qsl-card large" style="transform:rotate(${(card.no % 5 - 2) * 1}deg);">
+      <div class="qsl-top">ORBIT DIARY QSL CARD</div>
+      <div class="qsl-divider"></div>
+      <div class="qsl-label">\uD83D\uDCE1 \u5F15\u304D\u7D99\u304E\u8A3C\u660E</div>
+      <div class="qsl-pair">
+        <span>${card.from.emoji}</span>
+        <span class="qsl-pair-arrow">\u2192</span>
+        <span>${card.to.emoji}</span>
+      </div>
+      <div class="qsl-names">${card.from.nickname} \u2192 ${card.to.nickname}</div>
+      <div class="qsl-divider"></div>
+      <div class="qsl-time">${dateStr}</div>
+      <div class="qsl-nadir">\u76F4\u4E0B\u70B9: ${card.nadir}</div>
+      <div class="qsl-elev">\u4EF0\u89D2: ${card.fromEl}\u00B0 \u2192 ${card.toEl}\u00B0</div>
+      <div style="margin-top:8px;">
+        <span class="qsl-rarity qsl-rarity-${card.rarity.toLowerCase()}">${RARITY_STARS[card.rarity]}</span>
+      </div>
+      <div class="qsl-flavor">"${card.flavor}"</div>
+      <div class="qsl-number">No.${String(card.no).padStart(4,'0')}</div>
+      <div class="qsl-divider"></div>
+      <div class="qsl-footer">chibinemo.github.io</div>
+    </div>
+  `;
+}
+
+function buildCardsPage() {
+  const countEl = document.getElementById('cardsCount');
+  const contentEl = document.getElementById('cardsContent');
+  const rarityCount = { N:0, R:0, SR:0, SSR:0 };
+  cardCollection.forEach(c => rarityCount[c.rarity]++);
+  countEl.textContent = `${cardCollection.length}\u679A\u53CE\u96C6 \u2014 N:${rarityCount.N} R:${rarityCount.R} SR:${rarityCount.SR} SSR:${rarityCount.SSR}`;
+
+  if (cardCollection.length === 0) {
+    contentEl.innerHTML = '<div class="cards-empty">\u307E\u3060\u30AB\u30FC\u30C9\u304C\u3042\u308A\u307E\u305B\u3093\u3002<br>\u5F15\u304D\u7D99\u304E\u304C\u767A\u751F\u3059\u308B\u3068QSL\u30AB\u30FC\u30C9\u304C\u3082\u3089\u3048\u307E\u3059\uFF01</div>';
+    return;
+  }
+
+  contentEl.innerHTML = `<div class="cards-grid">${cardCollection.slice().reverse().map(c => renderQSLMini(c)).join('')}</div>`;
+}
+
+function buildSettingsPage() {
+  const grid = document.getElementById('settingsOshiGrid');
+  grid.innerHTML = SATS.map(s => `
+    <div class="settings-oshi-btn${oshiSatId === s.id ? ' selected' : ''}" onclick="setOshi('${s.id}')">
+      <div class="emoji">${s.emoji}</div>
+      <div class="name" style="color:${s.color};">${s.nickname}</div>
+      <div class="sub">${s.name}</div>
+    </div>
+  `).join('');
+}
+
+function buildSourceBar() {
+  const bar = document.getElementById('sourceBar');
+  if (bar) {
+    bar.innerHTML =
+      `SOURCE: ${tleSource} (${Object.keys(satRecs).length}\u6A5F)<br>` +
+      `SGP4 propagation via satellite.js<br>` +
+      `${tleEpoch ? 'TLE EPOCH: ' + tleEpoch : 'Fallback TLE (\u7CBE\u5EA6\u4F4E)'}<br>` +
+      `UPDATE: 1\u79D2\u9593\u9694\u30EA\u30A2\u30EB\u30BF\u30A4\u30E0\u8A08\u7B97`;
+  }
+  const bar2 = document.getElementById('sourceBarSats');
+  if (bar2) bar2.innerHTML = bar ? bar.innerHTML : '';
+}
+
+// ========== NAVIGATION ==========
+function switchPage(page) {
+  currentPage = page;
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  const pageMap = { home:'pageHome', sats:'pageSats', cards:'pageCards', settings:'pageSettings' };
+  const target = document.getElementById(pageMap[page]);
+  if (target) target.classList.add('active');
+
+  document.querySelectorAll('.nav-btn').forEach((btn, i) => {
+    const pages = ['home','sats','cards','settings'];
+    btn.classList.toggle('active', pages[i] === page);
+  });
+
+  if (page === 'cards') buildCardsPage();
+  if (page === 'settings') buildSettingsPage();
+}
+
+function setOshi(id) {
+  oshiSatId = id;
+  localStorage.setItem('orbit-diary-oshi', id);
+  if (currentPage === 'settings') buildSettingsPage();
+  if (currentPage !== 'home') switchPage('home');
 }
 
 // ========== MAIN LOOP ==========
@@ -1106,39 +1411,47 @@ function update() {
   const positions = getPositions(now);
 
   document.getElementById('clock').textContent = now.toLocaleTimeString('ja-JP');
-  document.getElementById('skyTime').textContent = now.toLocaleTimeString('ja-JP');
+  const skyTimeEl = document.getElementById('skyTime');
+  if (skyTimeEl) skyTimeEl.textContent = now.toLocaleTimeString('ja-JP');
 
-  buildOshi(positions);
-  buildProfile(positions);
-  drawSky(document.getElementById('skyCanvas'), positions);
-  buildDiary(positions, now);
-  buildSatsList(positions);
+  // Handoff detection (every cycle)
+  checkHandoff(positions, now);
+
+  // Home page
+  if (currentPage === 'home') {
+    buildOshiHero(positions, now);
+    buildSpeechBubble(positions, now);
+    buildNadir(positions);
+    buildOshiBar(positions);
+    drawSky(document.getElementById('skyCanvas'), positions);
+    buildHandoffCard();
+    buildSatsList(positions, 'satsList');
+    buildCardPreview();
+  }
+
+  // Sats page
+  if (currentPage === 'sats') {
+    buildSatsList(positions, 'satsListFull');
+  }
 }
 
 // ========== INIT ==========
 async function init() {
   await fetchTLEs();
+  if (Object.keys(satRecs).length === 0) loadFallbackTLEs();
 
-  // Ensure we always have data
-  if (Object.keys(satRecs).length === 0) {
-    loadFallbackTLEs();
-  }
-
-  document.getElementById('sourceBar').innerHTML =
-    `SOURCE: ${tleSource} (${Object.keys(satRecs).length}機)<br>` +
-    `SGP4 propagation via satellite.js<br>` +
-    `${tleEpoch ? 'TLE EPOCH: ' + tleEpoch : 'Fallback TLE (精度低)'}<br>` +
-    `UPDATE: 1秒間隔リアルタイム計算`;
+  buildSourceBar();
 
   document.getElementById('loading').classList.add('hidden');
   document.getElementById('main').style.display = 'block';
+  document.getElementById('bottomNav').style.display = 'flex';
 
   update();
   setInterval(update, 1000);
   window.addEventListener('resize', update);
 }
 
-// Service Worker registration
+// Service Worker
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('/sw.js').catch(() => {});
 }
@@ -1162,19 +1475,14 @@ if ('serviceWorker' in navigator) {
   function createStars() {
     stars = [];
     const w = window.innerWidth, h = window.innerHeight;
-    const count = Math.floor((w * h) / 3000); // density
+    const count = Math.floor((w * h) / 3000);
     const colors = [
-      'rgba(255,255,255,',      // white
-      'rgba(255,255,255,',
-      'rgba(255,255,255,',
-      'rgba(255,213,79,',       // gold
-      'rgba(100,181,246,',      // blue
-      'rgba(179,157,219,',      // purple
+      'rgba(255,255,255,','rgba(255,255,255,','rgba(255,255,255,',
+      'rgba(255,213,79,','rgba(100,181,246,','rgba(179,157,219,',
     ];
     for (let i = 0; i < count; i++) {
       stars.push({
-        x: Math.random() * w,
-        y: Math.random() * h,
+        x: Math.random() * w, y: Math.random() * h,
         r: Math.random() * 1.5 + 0.3,
         base: 0.2 + Math.random() * 0.6,
         speed: 0.3 + Math.random() * 0.7,
@@ -1197,7 +1505,6 @@ if ('serviceWorker' in navigator) {
       ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
       ctx.fillStyle = s.color + alpha.toFixed(2) + ')';
       ctx.fill();
-      // Slow drift
       s.y += s.drift;
       if (s.y < -2) s.y = h + 2;
       if (s.y > h + 2) s.y = -2;
