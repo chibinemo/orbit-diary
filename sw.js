@@ -1,4 +1,4 @@
-const CACHE_NAME = 'orbit-diary-v2';
+const CACHE_NAME = 'orbit-diary-v3';
 const PRECACHE = [
   '/realtime.html',
   '/manifest.json',
