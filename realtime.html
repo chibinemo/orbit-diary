@@ -441,16 +441,36 @@
 const SATS = [
   // QZO (figure-8 orbit)
   { id:'qzs2',  norad:42738, name:'みちびき2号機',  short:'02', type:'QZO', color:'#64b5f6', cd:'rgba(100,181,246,', cls:'c2',  launched:'2017.6.1',
-    bio:'QZO3機の一角。8の字軌道で日本上空とオーストラリア方面を行き来する。軌道傾斜角39.5°。他の2機と交代しながら日本を見守る。' },
+    nickname: 'ニーちゃん', emoji: '😎',
+    personality: 'cool',  // クール系・寡黙・頼れる兄貴
+    bio:'寡黙だけど仕事は確実。深夜〜早朝のシフトが多くて、みんなが寝てる間も黙々と信号を送り続けてる。口数は少ないけど、いざという時いちばん頼りになるタイプ。',
+    tone: { prefix: '…', suffix: '。', style: 'terse' },
+  },
   { id:'qzs4',  norad:42965, name:'みちびき4号機',  short:'04', type:'QZO', color:'#b39ddb', cd:'rgba(179,157,219,', cls:'c4',  launched:'2017.10.10',
-    bio:'QZO3機の一角。軌道傾斜角40.1°。8の字の上半分が日本上空。2号機、1R号機と位相をずらして飛び、24時間途切れない天頂カバーを実現。' },
+    nickname: 'ヨンちゃん', emoji: '✨',
+    personality: 'genki',  // 元気系・おしゃべり・アイドル気質
+    bio:'いちばんテンション高い。夕方〜夜のシフトで夜景を見るのが大好き。「今日も日本キレイ！」が口癖。ファンサが手厚い。自分のこと「ヨンちゃん」って呼ぶ。',
+    tone: { prefix: '', suffix: '！', style: 'excited' },
+  },
   { id:'qzs1r', norad:49336, name:'初号機後継(1R)',  short:'1R', type:'QZO', color:'#ef9a9a', cd:'rgba(239,154,154,', cls:'c1r', launched:'2021.10.26',
-    bio:'初代みちびきの後継としてQZO軌道に投入。軌道傾斜角37.3°。初号機から引き継いだ8の字を、いま自分の足で描いている。' },
+    nickname: 'いちあーる', emoji: '🔥',
+    personality: 'earnest',  // 真面目系・初代の意志を継ぐ・熱い
+    bio:'初代みちびきの軌道を引き継いだ。先代への敬意が強くて「初号機の分まで」が信条。真面目すぎてたまに空回りするけど、その一生懸命さがファンに刺さる。',
+    tone: { prefix: '', suffix: 'っ！', style: 'earnest' },
+  },
   // GEO (geostationary)
   { id:'qzs3',  norad:42917, name:'みちびき3号機',  short:'03', type:'GEO', color:'#ffd54f', cd:'rgba(255,213,79,',  cls:'c3',  launched:'2017.8.19',
-    bio:'静止軌道から24時間365日、同じ位置で日本を見守る。軌道傾斜角0.06°。動かないことが強み。QZO3機が交代する間もずっとここにいる。' },
+    nickname: 'さんちゃん', emoji: '🍵',
+    personality: 'calm',  // 落ち着き系・母性・見守り役
+    bio:'静止軌道からずっと同じ場所にいる。動かないことが強み。QZOの3機がわちゃわちゃしてるのを「まぁまぁ」って見守るお姉さんポジション。お茶が好き（設定）。',
+    tone: { prefix: '', suffix: 'ね。', style: 'gentle' },
+  },
   { id:'qzs6',  norad:62876, name:'みちびき6号機',  short:'06', type:'GEO', color:'#80deea', cd:'rgba(128,222,234,', cls:'c6',  launched:'2025.3.10',
-    bio:'GEO組の新人。3号機の相棒として静止軌道に配属。軌道傾斜角0.02°。まだ緊張しているが、信号の安定性は先輩譲り。' },
+    nickname: 'ろくちゃん', emoji: '🐣',
+    personality: 'shy',  // 新人・おどおど・成長枠
+    bio:'2025年に打ち上げられたばかりの最年少。3号機のとなりに配属されて緊張中。「あの…ちゃんとできてますか？」が口癖。でも信号の安定性は実はいちばん良い。',
+    tone: { prefix: 'あの…', suffix: 'です…', style: 'shy' },
+  },
 ];
 
 // Real TLEs fetched 2026-04-18 — used only when CelesTrak is unreachable
@@ -758,41 +778,78 @@ function getSelected(positions) {
   return getDuty(positions) || Object.values(positions).find(p => p.pos) || null;
 }
 
-// ========== NARRATIVE (based on actual subsatellite point) ==========
+// ========== NARRATIVE (キャラクター×直下点) ==========
+// 性格別テンプレート
+const VOICE = {
+  cool: { // 2号機：クール寡黙
+    zenith: (n,e) => `…<em>${n}</em>の真上。仰角${e}°。全部届く角度。…やることはやる。`,
+    high: (n,e,d) => `<em>${n}</em>、仰角${e}°。${d}方向。…悪くない位置だ。`,
+    mid: (n,e) => `直下点、<em>${n}</em>。仰角${e}°。…まだ見えてる。`,
+    low: (n,d) => `${d}の空、低い。…次の奴に任せる。`,
+    hidden: (n,a) => `日本からは見えない。<em>${n}</em>の高度${a}kmにいる。…少し休む。`,
+    geoVis: (n,e,d) => `…ここにいる。ずっと。<em>${n}</em>、仰角${e}°、${d}。`,
+    geoHid: (n) => `<em>${n}</em>。地平線の下。…でも仕事はしてる。`,
+  },
+  genki: { // 4号機：元気アイドル
+    zenith: (n,e) => `きたきた！<em>${n}</em>のほぼ真上！仰角${e}°！最高のポジション！みんなー、ヨンちゃんが見守ってるよー！`,
+    high: (n,e,d) => `<em>${n}</em>通過中〜！仰角${e}°、${d}のほう！けっこう高い位置にいるよ！地上の形がよく見える！`,
+    mid: (n,e) => `いま<em>${n}</em>の上にいるよ！仰角${e}°！8の字ルート楽しい〜！`,
+    low: (n,d) => `ん〜、ちょっと低くなってきちゃった。${d}のほう。でもまだがんばる！`,
+    hidden: (n,a) => `いまね、<em>${n}</em>のあたり、高度${a}kmを旅してるの。日本からは見えないけど、すぐ戻るから待っててね！`,
+    geoVis: (n,e,d) => `いつもの場所にいるよ〜。<em>${n}</em>、仰角${e}°！ずっとここで見守ってる！`,
+    geoHid: (n) => `あれ〜、そっちからは見えない位置？ でも<em>${n}</em>からみんなのこと見てるよ！`,
+  },
+  earnest: { // 1R：真面目・熱い
+    zenith: (n,e) => `報告します。<em>${n}</em>直上、仰角${e}°。最適な測位角度を維持中。初号機から受け継いだこの軌道、しっかり守ります！`,
+    high: (n,e,d) => `<em>${n}</em>上空、仰角${e}°、${d}方向。8の字軌道、予定通り。先代の分まで、確実にカバーしていきます。`,
+    mid: (n,e) => `直下点<em>${n}</em>。仰角${e}°。まだ日本を見守れる位置です。気を抜きません。`,
+    low: (n,d) => `仰角が下がってきました、${d}方向。…でもまだ信号は届きます。最後まで全力です。`,
+    hidden: (n,a) => `現在、<em>${n}</em>付近、高度${a}km。日本からは見えない位置ですが…8の字の南側も、大事な軌道の一部です。必ず戻ります。`,
+    geoVis: (n,e,d) => `静止軌道、<em>${n}</em>。仰角${e}°、${d}方向。ここからずっと見守っています。それが自分の任務です。`,
+    geoHid: (n) => `<em>${n}</em>。この観測地からは見えませんが…任務は続いています。`,
+  },
+  calm: { // 3号機：穏やか・お姉さん
+    zenith: (n,e) => `ふふ、<em>${n}</em>の真上ね。仰角${e}°。いつもの場所から、いつも通り。安心してね。`,
+    high: (n,e,d) => `<em>${n}</em>、仰角${e}°。${d}のほうにいるわ。今日も穏やかね。お茶でも飲みながら見守ってるわ。`,
+    mid: (n,e) => `直下点は<em>${n}</em>。仰角${e}°。まぁまぁ、ちゃんと見えてるから大丈夫よ。`,
+    low: (n,d) => `あら、${d}の空ね。少し低いけど…まぁ、こういう日もあるわ。`,
+    hidden: (n,a) => `<em>${n}</em>、高度${a}km。そっちからは見えないかしら。でも心配しないで、ちゃんとここにいるから。`,
+    geoVis: (n,e,d) => `いつもの場所よ。<em>${n}</em>、仰角${e}°。動かないのが私の取り柄。QZOの子たちが忙しく交代してる間も、ずっとここにいるわ。`,
+    geoHid: (n) => `<em>${n}</em>ね。見えない場所だけど…大丈夫、ちゃんと信号は届けてるわ。`,
+  },
+  shy: { // 6号機：新人・おどおど
+    zenith: (n,e) => `あ、あの…<em>${n}</em>の真上にいます…！仰角${e}°です…！ちゃんとできてますか…？`,
+    high: (n,e,d) => `<em>${n}</em>の上です…仰角${e}°、${d}のほう…。えっと、信号はちゃんと出てると思います…たぶん…。`,
+    mid: (n,e) => `直下点は<em>${n}</em>で…仰角${e}°です…。が、がんばってます…！`,
+    low: (n,d) => `す、すみません…${d}のほうで、ちょっと低くなっちゃいました…。でもまだ信号出してます…！`,
+    hidden: (n,a) => `あの…いま<em>${n}</em>の高度${a}kmにいます…見えない位置ですみません…。でもさんちゃん先輩がカバーしてくれてるはずです…！`,
+    geoVis: (n,e,d) => `あ…<em>${n}</em>にいます…仰角${e}°、${d}です…。さんちゃん先輩のとなりで、がんばってます…。`,
+    geoHid: (n) => `あの…<em>${n}</em>です…見えない位置ですみません…。でも信号はちゃんと出してます…！`,
+  },
+};
+
 function narrative(def, pos, hour) {
   if (!pos) return { text: 'データ計算中...', event: null, nadir: null };
 
-  const el = pos.el;
+  const el = pos.el.toFixed(1);
   const dir = azDir(pos.az);
   const alt = Math.round(pos.alt).toLocaleString();
   const nadir = reverseGeocode(pos.lat, pos.lon);
+  const v = VOICE[def.personality] || VOICE.calm;
   let text = '';
 
   if (def.type === 'QZO') {
-    const isOverJapan = pos.lat >= 24 && pos.lat <= 46 && pos.lon >= 122 && pos.lon <= 146;
-    const isNorthHemisphere = pos.lat > 10;
-
-    if (isOverJapan && el > 70) {
-      text = `いま、<em>${nadir.name}</em>の真上。仰角${el.toFixed(1)}°。直下点は北緯${pos.lat.toFixed(1)}°・東経${pos.lon.toFixed(1)}°。ビルの谷間にも山の谷にも、まっすぐ信号が届く角度。`;
-    } else if (isOverJapan && el > 30) {
-      text = `<em>${nadir.name}</em>を通過中。仰角${el.toFixed(1)}°、${dir}方向。8の字の上側ループで日本上空に留まっている。高度${alt}kmから見下ろすと、地表の形がはっきりわかる。`;
-    } else if (isNorthHemisphere && el > 0) {
-      text = `直下点は<em>${nadir.name}</em>。仰角${el.toFixed(1)}°。8の字軌道で${pos.lat > 30 ? '日本に近づいている' : '赤道方向へ移動中'}。高度${alt}km。`;
-    } else if (el > 0) {
-      text = `${dir}の低い空、仰角${el.toFixed(1)}°。直下点は<em>${nadir.name}</em>。8の字の下側ループ。そろそろ次の号機に引き継ぎの時間。`;
-    } else {
-      text = `いま日本からは見えない位置。直下点は<em>${nadir.name}</em>（南緯${Math.abs(pos.lat).toFixed(1)}°付近）。8の字の南側を高度${alt}kmで旅している。次に日本上空に戻るまで、しばし休憩。`;
-    }
+    if (pos.el > 70)      text = v.zenith(nadir.name, el);
+    else if (pos.el > 40) text = v.high(nadir.name, el, dir);
+    else if (pos.el > 10) text = v.mid(nadir.name, el);
+    else if (pos.el > 0)  text = v.low(nadir.name, dir);
+    else                  text = v.hidden(nadir.name, alt);
   } else {
-    // GEO — always near equator
-    if (el > 0) {
-      text = `静止軌道。直下点は<em>${nadir.name}</em>（北緯${pos.lat.toFixed(1)}°・東経${pos.lon.toFixed(1)}°）。いつもほぼ同じ場所、高度${alt}km。${dir}の空、仰角${el.toFixed(1)}°にずっといる。動かないことが私の強み。`;
-    } else {
-      text = `直下点は<em>${nadir.name}</em>。この観測地からは地平線の下だが、日本の広い範囲からは見えている。静止軌道は動かない。`;
-    }
+    if (pos.el > 0) text = v.geoVis(nadir.name, el, dir);
+    else            text = v.geoHid(nadir.name);
   }
 
-  // Ground event — based on actual nadir location
+  // Ground event
   let ev = null;
   if (nadir.events && nadir.events.length > 0) {
     ev = nadir.events[hour % nadir.events.length];
@@ -896,13 +953,15 @@ function buildOshi(positions) {
     const isDuty = duty && duty.def.id === def.id;
     const isSel = sel && sel.def.id === def.id;
     const vis = pos && pos.el > 0;
+    // Mood based on elevation
+    const mood = !pos ? '' : pos.el > 70 ? '🔥' : pos.el > 30 ? '😊' : pos.el > 0 ? '🙂' : '💤';
     return `
       <div class="oshi-chip sat-${def.cls}${isSel ? ' selected' : ''}${isDuty ? ' on-duty' : ''}" onclick="selectSat('${def.id}')">
-        <div class="oshi-avatar">
-          ${def.short}
+        <div class="oshi-avatar" style="font-size:20px;">
+          ${def.emoji}
           <div class="oshi-elev" style="color:${vis ? def.color : 'var(--text-dim)'}">${pos ? (vis ? pos.el.toFixed(0) + '°' : '▼') : '...'}</div>
         </div>
-        <div class="oshi-name">${def.name.replace('みちびき','').replace('(1R)','')}</div>
+        <div class="oshi-name">${def.nickname || def.short}</div>
       </div>`;
   }).join('');
 }
@@ -925,10 +984,10 @@ function buildProfile(positions) {
   el.innerHTML = `
     <div class="profile-top-row">
       <div class="profile-identity">
-        <div class="profile-avatar" style="background:${def.cd}0.15);border:2px solid ${def.cd}0.35);color:${def.color};">${def.short}</div>
+        <div class="profile-avatar" style="background:${def.cd}0.15);border:2px solid ${def.cd}0.35);color:${def.color};font-size:22px;">${def.emoji}</div>
         <div>
-          <div class="profile-name" style="color:${def.color};">${def.name}${isDuty ? ' 👑' : ''}</div>
-          <div class="profile-sub">${def.type} / ${def.launched}打上げ</div>
+          <div class="profile-name" style="color:${def.color};">${def.nickname || def.name}${isDuty ? ' 👑' : ''}</div>
+          <div class="profile-sub">${def.name} / ${def.type} / ${def.launched}打上げ</div>
         </div>
       </div>
       <button class="oshi-btn${isSel ? ' is-oshi' : ''}" style="${isSel ? `background:${def.cd}0.12);color:${def.color};border-color:${def.cd}0.3)` : ''}" onclick="toggleOshi('${def.id}')">
@@ -969,13 +1028,13 @@ function buildDiary(positions, now) {
   const shares = 100 + (seed * 13) % 500;
 
   el.innerHTML = `
-    <div class="diary-section-title">📖 ${def.name}の今</div>
+    <div class="diary-section-title">${def.emoji} ${def.nickname || def.name}のつぶやき</div>
     <div class="diary-post">
       <div class="post-header">
-        <div class="post-avatar" style="background:${def.cd}0.15);border:1.5px solid ${def.cd}0.3);color:${def.color};">${def.short}</div>
+        <div class="post-avatar" style="background:${def.cd}0.15);border:1.5px solid ${def.cd}0.3);font-size:14px;">${def.emoji}</div>
         <div class="post-meta">
-          <div class="post-author" style="color:${def.color};">${def.name}</div>
-          <div class="post-time">${now.toLocaleTimeString('ja-JP')} JST${isDuty ? ' — 当番中' : ''}</div>
+          <div class="post-author" style="color:${def.color};">${def.nickname || def.name} <span style="font-size:10px;color:var(--text-dim);font-weight:400;">@${def.id}</span></div>
+          <div class="post-time">${now.toLocaleTimeString('ja-JP')} JST${isDuty ? ' — 👑当番中' : ''}</div>
         </div>
       </div>
       ${nadirLabel ? `<div style="padding:6px 14px 0;font-size:11px;color:var(--text-dim);">📌 直下点: <span style="color:var(--text-sub);font-weight:500;">${nadirLabel}</span> <span style="font-family:'Space Mono';font-size:9px;">(${pos.lat.toFixed(2)}°${pos.lat > 0 ? 'N' : 'S'}, ${pos.lon.toFixed(2)}°${pos.lon > 0 ? 'E' : 'W'})</span></div>` : ''}
@@ -1019,9 +1078,9 @@ function buildSatsList(positions) {
 
     return `
       <div class="sr${isDuty ? ' is-duty' : ''}${isSel ? ' is-selected' : ''}" onclick="selectSat('${def.id}')" style="cursor:pointer;">
-        <div class="sr-av" style="background:${def.cd}0.12);border:1.5px solid ${def.cd}${vis ? '0.3' : '0.12'});color:${vis ? def.color : 'var(--text-dim)'};font-size:${def.short.length > 2 ? '9' : '10'}px;font-weight:900;">${def.short}</div>
+        <div class="sr-av" style="background:${def.cd}0.12);border:1.5px solid ${def.cd}${vis ? '0.3' : '0.12'});font-size:16px;">${def.emoji}</div>
         <div class="sr-info">
-          <div class="sr-name" style="color:${vis ? def.color : 'var(--text-dim)'};">${def.name}${isDuty ? ' 👑' : ''}</div>
+          <div class="sr-name" style="color:${vis ? def.color : 'var(--text-dim)'};">${def.nickname || def.name}${isDuty ? ' 👑' : ''} <span style="font-size:9px;opacity:0.5;">${def.short}</span></div>
           <div class="sr-sub">${nadirStr} / ${pos ? Math.round(pos.alt).toLocaleString() + 'km' : '---'}</div>
         </div>
         <div class="sr-right">
