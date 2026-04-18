@@ -112,70 +112,71 @@
   .page { display: none; }
   .page.active { display: block; }
 
-  /* ===== HOME: Oshi-first ===== */
-  .oshi-hero {
-    display: flex; flex-direction: column; align-items: center;
-    padding: 24px 20px 10px; text-align: center;
-  }
-  .oshi-hero-emoji {
-    font-size: 80px; line-height: 1;
-    filter: drop-shadow(0 0 30px rgba(255,255,255,0.1));
-    animation: float 4s ease-in-out infinite;
-  }
-  @keyframes float {
-    0%,100% { transform: translateY(0); }
-    50% { transform: translateY(-8px); }
-  }
-  .oshi-hero-name {
-    font-size: 28px; font-weight: 900; margin-top: 10px; letter-spacing: 1px;
-  }
-  .oshi-hero-status {
-    font-size: 14px; margin-top: 6px; font-weight: 500;
-  }
-  .oshi-hero-status.on-duty { color: var(--c3); }
-  .oshi-hero-status.off-duty { color: var(--text-dim); }
-
-  /* Speech bubble */
-  .speech-bubble-wrap {
-    margin: 16px 20px 0; position: relative;
-  }
-  .speech-bubble {
-    padding: 20px 22px; border-radius: 20px;
-    font-size: 15px; line-height: 2; font-weight: 300;
-    color: var(--text-sub); position: relative;
+  /* ===== HOME: Unified oshi card ===== */
+  .oshi-card-main {
+    margin: 12px 20px 16px;
+    border-radius: 22px;
+    overflow: hidden;
+    position: relative;
     backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
   }
-  .speech-bubble em { font-style: normal; font-weight: 500; }
-  .speech-bubble::before {
-    content: ''; position: absolute; top: -10px; left: 50%;
-    transform: translateX(-50%);
-    border-left: 10px solid transparent; border-right: 10px solid transparent;
-    border-bottom: 10px solid;
+  .oshi-card-main::before {
+    content: '';
+    position: absolute;
+    top: -30px; right: -30px;
+    width: 140px; height: 140px;
+    background: radial-gradient(circle, rgba(255,255,255,0.04), transparent 70%);
+    animation: cardGlow 6s ease-in-out infinite;
   }
-  .speech-event {
-    margin-top: 12px; padding: 10px 12px;
-    background: rgba(255,255,255,0.03); border: 1px solid var(--border);
-    border-radius: 10px; display: flex; align-items: flex-start; gap: 8px;
+  .ocm-top {
+    display: flex; align-items: center; gap: 14px;
+    padding: 20px 20px 14px;
   }
-  .speech-event-icon { font-size: 16px; flex-shrink: 0; }
-  .speech-event-body { flex: 1; }
-  .speech-event-title { font-size: 11px; font-weight: 500; color: var(--text); }
-  .speech-event-desc { font-size: 10px; color: var(--text-sub); line-height: 1.5; }
-
-  /* Nadir info */
-  .oshi-nadir {
-    margin: 10px 20px 0; padding: 8px 14px;
-    background: var(--bg-card); border: 1px solid var(--border);
-    border-radius: 10px; font-size: 11px; color: var(--text-dim);
-    display: flex; align-items: center; justify-content: space-between;
+  .ocm-emoji {
+    font-size: 52px; line-height: 1;
+    filter: drop-shadow(0 0 16px rgba(255,255,255,0.08));
+    animation: float 4s ease-in-out infinite;
+    flex-shrink: 0;
+  }
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-6px); }
+  }
+  .ocm-info { flex: 1; }
+  .ocm-name { font-size: 22px; font-weight: 900; letter-spacing: 1px; }
+  .ocm-status { font-size: 12px; margin-top: 2px; font-weight: 500; }
+  .ocm-status.on { color: var(--c3); }
+  .ocm-status.off { color: var(--text-dim); }
+  .ocm-meta {
+    display: flex; gap: 12px; margin-top: 6px;
+    font-size: 10px; color: var(--text-dim);
     font-family: 'Space Mono', monospace;
   }
-  .oshi-nadir .loc { color: var(--text-sub); font-weight: 500; font-family: 'Noto Sans JP', sans-serif; }
-
-  /* Scroll divider */
-  .scroll-hint {
-    text-align: center; padding: 18px 0 10px;
-    font-size: 10px; color: var(--text-dim); letter-spacing: 4px;
+  .ocm-meta strong { color: var(--text-sub); font-weight: 700; }
+  .ocm-speech {
+    padding: 14px 20px 16px;
+    font-size: 15px; line-height: 2;
+    font-weight: 300; color: var(--text-sub);
+    border-top: 1px solid var(--border);
+  }
+  .ocm-speech em { font-style: normal; font-weight: 500; }
+  .ocm-event {
+    margin: 0 20px 16px; padding: 10px 12px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border); border-radius: 10px;
+    display: flex; align-items: flex-start; gap: 8px;
+  }
+  .ocm-event-icon { font-size: 16px; flex-shrink: 0; }
+  .ocm-event-body { flex: 1; }
+  .ocm-event-title { font-size: 11px; font-weight: 500; color: var(--text); }
+  .ocm-event-desc { font-size: 10px; color: var(--text-sub); line-height: 1.5; }
+  .ocm-nadir {
+    padding: 10px 20px 14px;
+    font-size: 11px; color: var(--text-dim);
+    display: flex; align-items: center; justify-content: space-between;
+    border-top: 1px solid rgba(255,255,255,0.04);
+  }
+  .ocm-nadir .loc { color: var(--text-sub); font-weight: 500; font-family: 'Noto Sans JP', sans-serif; }
   }
 
   /* Oshi selector row */
@@ -467,11 +468,7 @@
 
     <!-- PAGE: Home -->
     <div class="page active" id="pageHome">
-      <div class="oshi-hero fade-in" id="oshiHero"></div>
-      <div class="speech-bubble-wrap fade-in" id="speechWrap"></div>
-      <div class="oshi-nadir fade-in" id="oshiNadir"></div>
-
-      <div class="scroll-hint">── scroll down ──</div>
+      <div class="oshi-card-main fade-in" id="oshiMain"></div>
 
       <div class="section-title fade-in">推しを選ぶ</div>
       <div class="oshi-scroll fade-in" id="oshiBar"></div>
@@ -788,8 +785,7 @@ async function fetchTLEs() {
   }
   if (Object.keys(satRecs).length > 0) { tleSource = 'celestrak-individual'; return true; }
 
-  st.textContent = 'Fallback TLE...';
-  loadFallbackTLEs();
+  // フォールバックはinit()で先にロード済みなので再ロード不要
   return false;
 }
 
@@ -1140,58 +1136,51 @@ function checkHandoff(positions, now) {
 }
 
 // ========== UI BUILD ==========
-function buildOshiHero(positions, now) {
-  const el = document.getElementById('oshiHero');
+function buildOshiMain(positions, now) {
+  const el = document.getElementById('oshiMain');
   const entry = getOshi(positions);
   if (!entry) { el.innerHTML = ''; return; }
   const { pos, def } = entry;
   const duty = getDuty(positions);
   const isDuty = duty && duty.def.id === def.id;
-
-  el.innerHTML = `
-    <div class="oshi-hero-emoji">${def.emoji}</div>
-    <div class="oshi-hero-name" style="color:${def.color};">${def.nickname}</div>
-    <div class="oshi-hero-status ${isDuty ? 'on-duty' : 'off-duty'}">
-      ${isDuty ? '\u5F53\u756A\u4E2D \uD83D\uDC51' : (pos && pos.el > 0 ? '\u8996\u91CE\u5185' : '\u4F11\u61A9\u4E2D \uD83D\uDCA4')}
-    </div>
-  `;
-}
-
-function buildSpeechBubble(positions, now) {
-  const wrap = document.getElementById('speechWrap');
-  const entry = getOshi(positions);
-  if (!entry) { wrap.innerHTML = ''; return; }
-  const { pos, def } = entry;
   const hour = now.getHours();
-  const { text, event } = narrative(def, pos, hour);
+  const { text, event, nadir } = narrative(def, pos, hour);
+  const vis = pos && pos.el > 0;
+  const statusText = isDuty ? '当番中 👑' : (vis ? '視野内' : '休憩中 💤');
+  const nadirName = nadir ? `${nadir.flag} ${nadir.name}` : '';
 
-  wrap.innerHTML = `
-    <div class="speech-bubble" style="background:${def.cd}0.06);border:1px solid ${def.cd}0.15);">
-      <style>.speech-bubble::before { border-bottom-color: ${def.cd}0.15); }</style>
-      <div>${text}</div>
-      ${event ? `
-        <div class="speech-event">
-          <div class="speech-event-icon">${event.icon}</div>
-          <div class="speech-event-body">
-            <div class="speech-event-title">${event.title}</div>
-            <div class="speech-event-desc">${event.desc}</div>
-          </div>
-        </div>
-      ` : ''}
-    </div>
-  `;
-}
-
-function buildNadir(positions) {
-  const el = document.getElementById('oshiNadir');
-  const entry = getOshi(positions);
-  if (!entry || !entry.pos) { el.innerHTML = ''; return; }
-  const { pos, def } = entry;
-  const nadir = reverseGeocode(pos.lat, pos.lon);
+  el.style.background = `linear-gradient(135deg, ${def.cd}0.07), ${def.cd}0.02))`;
+  el.style.border = `1px solid ${def.cd}0.15)`;
 
   el.innerHTML = `
-    <span>${nadir.flag} <span class="loc">${nadir.name}</span></span>
-    <span>EL ${pos.el.toFixed(1)}\u00B0 / ${Math.round(pos.alt).toLocaleString()}km</span>
+    <div class="ocm-top">
+      <div class="ocm-emoji">${def.emoji}</div>
+      <div class="ocm-info">
+        <div class="ocm-name" style="color:${def.color};">${def.nickname}</div>
+        <div class="ocm-status ${isDuty ? 'on' : 'off'}">${statusText}</div>
+        <div class="ocm-meta">
+          <span>EL <strong>${pos ? pos.el.toFixed(1) + '°' : '---'}</strong></span>
+          <span>${pos ? azDir(pos.az) : '---'}</span>
+          <span>${pos ? Math.round(pos.alt).toLocaleString() + 'km' : '---'}</span>
+        </div>
+      </div>
+    </div>
+    <div class="ocm-speech">${text}</div>
+    ${event ? `
+      <div class="ocm-event">
+        <div class="ocm-event-icon">${event.icon}</div>
+        <div class="ocm-event-body">
+          <div class="ocm-event-title">${event.title}</div>
+          <div class="ocm-event-desc">${event.desc}</div>
+        </div>
+      </div>
+    ` : ''}
+    ${nadirName ? `
+      <div class="ocm-nadir">
+        <span>📌 <span class="loc">${nadirName}</span></span>
+        <span style="font-family:'Space Mono',monospace;font-size:9px;">${pos.lat.toFixed(2)}°${pos.lat>0?'N':'S'} ${pos.lon.toFixed(2)}°${pos.lon>0?'E':'W'}</span>
+      </div>
+    ` : ''}
   `;
 }
 
@@ -1419,9 +1408,7 @@ function update() {
 
   // Home page
   if (currentPage === 'home') {
-    buildOshiHero(positions, now);
-    buildSpeechBubble(positions, now);
-    buildNadir(positions);
+    buildOshiMain(positions, now);
     buildOshiBar(positions);
     drawSky(document.getElementById('skyCanvas'), positions);
     buildHandoffCard();
@@ -1437,18 +1424,20 @@ function update() {
 
 // ========== INIT ==========
 async function init() {
-  await fetchTLEs();
-  if (Object.keys(satRecs).length === 0) loadFallbackTLEs();
-
-  buildSourceBar();
-
+  // 1) まずフォールバックTLEで即表示
+  loadFallbackTLEs();
   document.getElementById('loading').classList.add('hidden');
   document.getElementById('main').style.display = 'block';
   document.getElementById('bottomNav').style.display = 'flex';
-
   update();
   setInterval(update, 1000);
   window.addEventListener('resize', update);
+
+  // 2) バックグラウンドで最新TLEを取得→取得できたら差し替え
+  try {
+    await fetchTLEs();
+    buildSourceBar();
+  } catch(_) {}
 }
 
 // Service Worker
