@@ -1,0 +1,1005 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Orbit Diary — ISS 今日の旅</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&family=Space+Mono:wght@400;700&display=swap');
+
+  :root {
+    --bg-deep: #0a0e1a;
+    --bg-card: rgba(255,255,255,0.04);
+    --bg-card-hover: rgba(255,255,255,0.07);
+    --accent: #4fc3f7;
+    --accent-warm: #ffb74d;
+    --accent-green: #81c784;
+    --accent-pink: #f48fb1;
+    --text-primary: #e8eaf6;
+    --text-secondary: rgba(255,255,255,0.55);
+    --text-dim: rgba(255,255,255,0.3);
+    --border: rgba(255,255,255,0.08);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Noto Sans JP', sans-serif;
+    background: var(--bg-deep);
+    color: var(--text-primary);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Stars background */
+  body::before {
+    content: '';
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background:
+      radial-gradient(1px 1px at 10% 20%, rgba(255,255,255,0.4), transparent),
+      radial-gradient(1px 1px at 30% 60%, rgba(255,255,255,0.3), transparent),
+      radial-gradient(1px 1px at 50% 10%, rgba(255,255,255,0.5), transparent),
+      radial-gradient(1px 1px at 70% 80%, rgba(255,255,255,0.2), transparent),
+      radial-gradient(1px 1px at 90% 40%, rgba(255,255,255,0.4), transparent),
+      radial-gradient(1px 1px at 15% 90%, rgba(255,255,255,0.3), transparent),
+      radial-gradient(1px 1px at 85% 15%, rgba(255,255,255,0.3), transparent),
+      radial-gradient(1.5px 1.5px at 25% 45%, rgba(255,255,255,0.6), transparent),
+      radial-gradient(1px 1px at 60% 35%, rgba(255,255,255,0.2), transparent),
+      radial-gradient(1.5px 1.5px at 45% 75%, rgba(255,255,255,0.5), transparent),
+      radial-gradient(1px 1px at 5% 55%, rgba(255,255,255,0.3), transparent),
+      radial-gradient(1px 1px at 75% 55%, rgba(255,255,255,0.2), transparent),
+      radial-gradient(1px 1px at 40% 95%, rgba(255,255,255,0.4), transparent),
+      radial-gradient(1px 1px at 95% 70%, rgba(255,255,255,0.3), transparent);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .app {
+    max-width: 430px;
+    margin: 0 auto;
+    min-height: 100vh;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Hero section */
+  .hero {
+    padding: 48px 24px 32px;
+    text-align: center;
+    position: relative;
+  }
+
+  .hero::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 24px; right: 24px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--border), transparent);
+  }
+
+  .date-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 3px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .hero-title {
+    font-size: 28px;
+    font-weight: 300;
+    line-height: 1.5;
+    margin-bottom: 4px;
+    color: var(--text-primary);
+  }
+
+  .hero-title strong {
+    font-weight: 700;
+    color: var(--accent);
+  }
+
+  .hero-sub {
+    font-size: 13px;
+    color: var(--text-secondary);
+    font-weight: 300;
+    margin-top: 8px;
+  }
+
+  /* ISS position indicator */
+  .iss-now {
+    margin: 24px 24px 0;
+    padding: 20px;
+    background: linear-gradient(135deg, rgba(79,195,247,0.08), rgba(79,195,247,0.02));
+    border: 1px solid rgba(79,195,247,0.15);
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .iss-now::before {
+    content: '';
+    position: absolute;
+    top: -20px; right: -20px;
+    width: 80px; height: 80px;
+    background: radial-gradient(circle, rgba(79,195,247,0.15), transparent 70%);
+  }
+
+  .iss-dot-container {
+    position: relative;
+    width: 48px;
+    height: 48px;
+    flex-shrink: 0;
+  }
+
+  .iss-dot {
+    width: 12px; height: 12px;
+    background: var(--accent);
+    border-radius: 50%;
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    box-shadow: 0 0 12px rgba(79,195,247,0.6);
+  }
+
+  .iss-dot::after {
+    content: '';
+    position: absolute;
+    top: -6px; left: -6px;
+    width: 24px; height: 24px;
+    border: 1.5px solid rgba(79,195,247,0.3);
+    border-radius: 50%;
+    animation: pulse 2s ease-out infinite;
+  }
+
+  @keyframes pulse {
+    0% { transform: scale(1); opacity: 1; }
+    100% { transform: scale(2.5); opacity: 0; }
+  }
+
+  .iss-orbit-ring {
+    width: 48px; height: 48px;
+    border: 1px dashed rgba(79,195,247,0.2);
+    border-radius: 50%;
+    position: absolute;
+    top: 0; left: 0;
+    animation: spin 20s linear infinite;
+  }
+
+  @keyframes spin {
+    100% { transform: rotate(360deg); }
+  }
+
+  .iss-now-text {
+    flex: 1;
+  }
+
+  .iss-now-label {
+    font-size: 11px;
+    color: var(--accent);
+    font-weight: 500;
+    letter-spacing: 1px;
+    margin-bottom: 4px;
+  }
+
+  .iss-now-location {
+    font-size: 17px;
+    font-weight: 500;
+    margin-bottom: 2px;
+  }
+
+  .iss-now-detail {
+    font-size: 12px;
+    color: var(--text-secondary);
+    font-family: 'Space Mono', monospace;
+  }
+
+  .iss-now-side {
+    text-align: right;
+    flex-shrink: 0;
+  }
+
+  .day-night-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 500;
+  }
+
+  .day-night-badge.night {
+    background: rgba(63,81,181,0.2);
+    color: #9fa8da;
+    border: 1px solid rgba(63,81,181,0.3);
+  }
+
+  .day-night-badge.day {
+    background: rgba(255,183,77,0.15);
+    color: var(--accent-warm);
+    border: 1px solid rgba(255,183,77,0.2);
+  }
+
+  /* Stats row */
+  .stats-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 12px;
+    margin: 20px 24px 0;
+  }
+
+  .stat-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 16px 12px;
+    text-align: center;
+  }
+
+  .stat-value {
+    font-family: 'Space Mono', monospace;
+    font-size: 24px;
+    font-weight: 700;
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+
+  .stat-value.accent { color: var(--accent); }
+  .stat-value.warm { color: var(--accent-warm); }
+  .stat-value.green { color: var(--accent-green); }
+
+  .stat-label {
+    font-size: 10px;
+    color: var(--text-secondary);
+    letter-spacing: 0.5px;
+    line-height: 1.4;
+  }
+
+  /* Tonight card */
+  .tonight-card {
+    margin: 20px 24px 0;
+    padding: 20px;
+    background: linear-gradient(135deg, rgba(255,183,77,0.1), rgba(255,183,77,0.02));
+    border: 1px solid rgba(255,183,77,0.15);
+    border-radius: 16px;
+    position: relative;
+  }
+
+  .tonight-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+  }
+
+  .tonight-label {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--accent-warm);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .tonight-action {
+    font-size: 11px;
+    color: var(--text-dim);
+    background: rgba(255,255,255,0.06);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 4px 12px;
+    cursor: pointer;
+  }
+
+  .pass-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+  }
+
+  .pass-item:last-child { border-bottom: none; }
+
+  .pass-time {
+    font-family: 'Space Mono', monospace;
+    font-size: 15px;
+    font-weight: 700;
+    width: 52px;
+    flex-shrink: 0;
+  }
+
+  .pass-info {
+    flex: 1;
+  }
+
+  .pass-direction {
+    font-size: 13px;
+    font-weight: 400;
+    margin-bottom: 2px;
+  }
+
+  .pass-brightness {
+    font-size: 11px;
+    color: var(--text-secondary);
+  }
+
+  .pass-quality {
+    flex-shrink: 0;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 500;
+  }
+
+  .pass-quality.excellent {
+    background: rgba(129,199,132,0.15);
+    color: var(--accent-green);
+    border: 1px solid rgba(129,199,132,0.3);
+  }
+
+  .pass-quality.good {
+    background: rgba(255,183,77,0.12);
+    color: var(--accent-warm);
+    border: 1px solid rgba(255,183,77,0.2);
+  }
+
+  /* Journey timeline */
+  .section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 28px 24px 14px;
+  }
+
+  .section-title {
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--text-primary);
+  }
+
+  .section-more {
+    font-size: 11px;
+    color: var(--text-dim);
+  }
+
+  .journey-list {
+    margin: 0 24px;
+    position: relative;
+  }
+
+  .journey-list::before {
+    content: '';
+    position: absolute;
+    left: 15px;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background: linear-gradient(180deg, var(--accent), rgba(79,195,247,0.1));
+  }
+
+  .journey-item {
+    display: flex;
+    gap: 16px;
+    padding: 14px 0;
+    position: relative;
+  }
+
+  .journey-dot {
+    width: 30px;
+    height: 30px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    position: relative;
+    z-index: 1;
+    background: var(--bg-deep);
+    border-radius: 50%;
+  }
+
+  .journey-content {
+    flex: 1;
+    padding-top: 4px;
+  }
+
+  .journey-time {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--text-dim);
+    margin-bottom: 3px;
+  }
+
+  .journey-text {
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1.5;
+    color: var(--text-primary);
+  }
+
+  .journey-text em {
+    font-style: normal;
+    color: var(--accent);
+    font-weight: 500;
+  }
+
+  .journey-text .warm {
+    color: var(--accent-warm);
+  }
+
+  .journey-text .green {
+    color: var(--accent-green);
+  }
+
+  /* Crew card */
+  .crew-card {
+    margin: 20px 24px 0;
+    padding: 20px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+  }
+
+  .crew-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+
+  .crew-count {
+    font-size: 13px;
+    font-weight: 500;
+  }
+
+  .crew-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .crew-member {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    font-size: 12px;
+  }
+
+  .crew-flag {
+    font-size: 14px;
+  }
+
+  .crew-name {
+    color: var(--text-primary);
+    font-weight: 400;
+  }
+
+  /* Orbit map placeholder */
+  .orbit-map {
+    margin: 20px 24px 0;
+    height: 180px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .orbit-map-inner {
+    width: 100%;
+    height: 100%;
+    position: relative;
+  }
+
+  /* Simple world map using CSS */
+  .map-grid {
+    position: absolute;
+    inset: 0;
+    opacity: 0.08;
+  }
+
+  .map-grid-line {
+    position: absolute;
+    background: white;
+  }
+
+  .map-grid-line.h {
+    width: 100%; height: 1px;
+  }
+
+  .map-grid-line.v {
+    width: 1px; height: 100%;
+  }
+
+  .orbit-path {
+    position: absolute;
+    inset: 20px;
+  }
+
+  .orbit-path svg {
+    width: 100%;
+    height: 100%;
+  }
+
+  .map-label {
+    position: absolute;
+    font-size: 9px;
+    color: var(--text-dim);
+    font-family: 'Space Mono', monospace;
+  }
+
+  .map-iss-marker {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    background: var(--accent);
+    border-radius: 50%;
+    box-shadow: 0 0 10px rgba(79,195,247,0.6), 0 0 20px rgba(79,195,247,0.3);
+    transform: translate(-50%, -50%);
+    animation: markerPulse 2s ease-in-out infinite;
+  }
+
+  @keyframes markerPulse {
+    0%, 100% { box-shadow: 0 0 10px rgba(79,195,247,0.6), 0 0 20px rgba(79,195,247,0.3); }
+    50% { box-shadow: 0 0 15px rgba(79,195,247,0.8), 0 0 30px rgba(79,195,247,0.4); }
+  }
+
+  .map-japan {
+    position: absolute;
+    font-size: 10px;
+    color: var(--accent-warm);
+    opacity: 0.6;
+  }
+
+  /* Countdown */
+  .countdown-bar {
+    margin: 20px 24px 0;
+    padding: 16px 20px;
+    background: linear-gradient(135deg, rgba(129,199,132,0.08), rgba(129,199,132,0.02));
+    border: 1px solid rgba(129,199,132,0.15);
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .countdown-text {
+    font-size: 13px;
+    font-weight: 400;
+    color: var(--text-secondary);
+  }
+
+  .countdown-text strong {
+    color: var(--accent-green);
+    font-weight: 700;
+    font-family: 'Space Mono', monospace;
+    font-size: 18px;
+  }
+
+  .countdown-label {
+    font-size: 11px;
+    color: var(--text-dim);
+  }
+
+  .notify-btn {
+    padding: 8px 16px;
+    background: rgba(129,199,132,0.15);
+    border: 1px solid rgba(129,199,132,0.3);
+    border-radius: 20px;
+    color: var(--accent-green);
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    font-family: 'Noto Sans JP', sans-serif;
+    transition: all 0.2s;
+  }
+
+  .notify-btn:hover {
+    background: rgba(129,199,132,0.25);
+  }
+
+  /* Fun fact */
+  .fun-fact {
+    margin: 20px 24px;
+    padding: 16px 20px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    border-left: 3px solid var(--accent-pink);
+  }
+
+  .fun-fact-label {
+    font-size: 10px;
+    color: var(--accent-pink);
+    font-weight: 500;
+    letter-spacing: 1px;
+    margin-bottom: 6px;
+  }
+
+  .fun-fact-text {
+    font-size: 13px;
+    line-height: 1.7;
+    color: var(--text-secondary);
+    font-weight: 300;
+  }
+
+  /* Bottom nav */
+  .bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 430px;
+    background: rgba(10,14,26,0.92);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-around;
+    padding: 10px 0 28px;
+    z-index: 100;
+  }
+
+  .nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    font-size: 10px;
+    color: var(--text-dim);
+    cursor: pointer;
+    transition: color 0.2s;
+    padding: 4px 12px;
+  }
+
+  .nav-item.active {
+    color: var(--accent);
+  }
+
+  .nav-item .nav-icon {
+    font-size: 20px;
+  }
+
+  /* Spacer for bottom nav */
+  .bottom-spacer {
+    height: 80px;
+  }
+
+  /* Animations */
+  .fade-in {
+    animation: fadeIn 0.6s ease-out both;
+  }
+
+  .fade-in-delay-1 { animation-delay: 0.1s; }
+  .fade-in-delay-2 { animation-delay: 0.2s; }
+  .fade-in-delay-3 { animation-delay: 0.3s; }
+  .fade-in-delay-4 { animation-delay: 0.4s; }
+  .fade-in-delay-5 { animation-delay: 0.5s; }
+  .fade-in-delay-6 { animation-delay: 0.6s; }
+  .fade-in-delay-7 { animation-delay: 0.7s; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Scroll */
+  ::-webkit-scrollbar { width: 0; }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- Hero -->
+  <div class="hero fade-in">
+    <div class="date-label">2026年4月18日 金曜日</div>
+    <h1 class="hero-title">
+      ISSは今日、地球を<br><strong>9周</strong>旅しました
+    </h1>
+    <p class="hero-sub">残り7周 — 日没までにあと2回、日本上空を通過します</p>
+  </div>
+
+  <!-- ISS Now -->
+  <div class="iss-now fade-in fade-in-delay-1">
+    <div class="iss-dot-container">
+      <div class="iss-orbit-ring"></div>
+      <div class="iss-dot"></div>
+    </div>
+    <div class="iss-now-text">
+      <div class="iss-now-label">LIVE</div>
+      <div class="iss-now-location">南太平洋上空</div>
+      <div class="iss-now-detail">高度 408km / 27,600km/h</div>
+    </div>
+    <div class="iss-now-side">
+      <div class="day-night-badge day">
+        ☀️ 昼側
+      </div>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-row fade-in fade-in-delay-2">
+    <div class="stat-card">
+      <div class="stat-value accent">16</div>
+      <div class="stat-label">今日の<br>周回数</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value warm">3</div>
+      <div class="stat-label">日本上空<br>通過回数</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value green">2</div>
+      <div class="stat-label">今夜の<br>可視パス</div>
+    </div>
+  </div>
+
+  <!-- Tonight -->
+  <div class="tonight-card fade-in fade-in-delay-3">
+    <div class="tonight-header">
+      <div class="tonight-label">🌙 今夜、見えるチャンス</div>
+      <div class="tonight-action">東京基準</div>
+    </div>
+    <div class="pass-item">
+      <div class="pass-time">19:23</div>
+      <div class="pass-info">
+        <div class="pass-direction">北西 → 南東 へ横切る（5分12秒）</div>
+        <div class="pass-brightness">最大仰角 67° / 等級 -3.2（金星級）</div>
+      </div>
+      <div class="pass-quality excellent">最高</div>
+    </div>
+    <div class="pass-item">
+      <div class="pass-time">20:58</div>
+      <div class="pass-info">
+        <div class="pass-direction">西 → 南 へ低く通過（2分48秒）</div>
+        <div class="pass-brightness">最大仰角 28° / 等級 -1.5</div>
+      </div>
+      <div class="pass-quality good">良好</div>
+    </div>
+  </div>
+
+  <!-- Countdown -->
+  <div class="countdown-bar fade-in fade-in-delay-4">
+    <div>
+      <div class="countdown-text">次の日本上空通過まで <strong>47分</strong></div>
+      <div class="countdown-label">18:32 ごろ 北海道上空を通過予定</div>
+    </div>
+    <button class="notify-btn">通知する</button>
+  </div>
+
+  <!-- Orbit Map -->
+  <div class="section-header fade-in fade-in-delay-4">
+    <div class="section-title">現在の軌道</div>
+    <div class="section-more">拡大 →</div>
+  </div>
+  <div class="orbit-map fade-in fade-in-delay-4">
+    <div class="orbit-map-inner">
+      <!-- Grid lines -->
+      <div class="map-grid">
+        <div class="map-grid-line h" style="top:25%"></div>
+        <div class="map-grid-line h" style="top:50%"></div>
+        <div class="map-grid-line h" style="top:75%"></div>
+        <div class="map-grid-line v" style="left:20%"></div>
+        <div class="map-grid-line v" style="left:40%"></div>
+        <div class="map-grid-line v" style="left:60%"></div>
+        <div class="map-grid-line v" style="left:80%"></div>
+      </div>
+      <!-- Orbit path -->
+      <svg style="position:absolute;inset:0;width:100%;height:100%;" viewBox="0 0 400 180" preserveAspectRatio="none">
+        <path d="M 0,120 C 60,140 100,50 160,30 S 260,110 320,130 S 380,60 400,40"
+              stroke="rgba(79,195,247,0.3)" stroke-width="1.5" fill="none" stroke-dasharray="4,4"/>
+        <path d="M 0,50 C 60,70 100,150 160,170 S 260,30 320,10"
+              stroke="rgba(79,195,247,0.15)" stroke-width="1" fill="none" stroke-dasharray="3,6"/>
+      </svg>
+      <!-- Labels -->
+      <div class="map-label" style="top:8px;left:8px;">60°N</div>
+      <div class="map-label" style="bottom:8px;left:8px;">60°S</div>
+      <div class="map-label" style="top:46%;left:8px;color:rgba(255,255,255,0.15);">EQ</div>
+      <!-- Japan marker -->
+      <div class="map-japan" style="top:28%;right:18%;">🗾</div>
+      <!-- ISS marker -->
+      <div class="map-iss-marker" style="top:68%;left:45%;"></div>
+      <div class="map-label" style="top:72%;left:48%;color:var(--accent);font-weight:bold;">ISS</div>
+    </div>
+  </div>
+
+  <!-- Journey Timeline -->
+  <div class="section-header fade-in fade-in-delay-5">
+    <div class="section-title">今日の旅ログ</div>
+    <div class="section-more">全て見る →</div>
+  </div>
+  <div class="journey-list fade-in fade-in-delay-5">
+    <div class="journey-item">
+      <div class="journey-dot">🌅</div>
+      <div class="journey-content">
+        <div class="journey-time">06:12 JST</div>
+        <div class="journey-text">
+          <em>サハラ砂漠</em>の上空で日の出を迎えた。今日8回目の日の出
+        </div>
+      </div>
+    </div>
+    <div class="journey-item">
+      <div class="journey-dot">🇯🇵</div>
+      <div class="journey-content">
+        <div class="journey-time">08:47 JST</div>
+        <div class="journey-text">
+          <span class="warm">日本列島</span>を北東方向に縦断。九州から北海道まで約4分で通過
+        </div>
+      </div>
+    </div>
+    <div class="journey-item">
+      <div class="journey-dot">🌊</div>
+      <div class="journey-content">
+        <div class="journey-time">11:23 JST</div>
+        <div class="journey-text">
+          <em>太平洋</em>上空を横断中。下は一面の海。最も近い陸地はハワイまで2,400km
+        </div>
+      </div>
+    </div>
+    <div class="journey-item">
+      <div class="journey-dot">🏔️</div>
+      <div class="journey-content">
+        <div class="journey-time">14:05 JST</div>
+        <div class="journey-text">
+          <span class="green">アンデス山脈</span>を横切った。高度6,000mの山々を高度408kmから見下ろす
+        </div>
+      </div>
+    </div>
+    <div class="journey-item">
+      <div class="journey-dot">🌙</div>
+      <div class="journey-content">
+        <div class="journey-time">16:30 JST</div>
+        <div class="journey-text">
+          地球の影に入り<em>夜側</em>へ。オーロラが見えるかもしれない緯度を通過中
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Crew -->
+  <div class="section-header fade-in fade-in-delay-6">
+    <div class="section-title">いま乗っている人たち</div>
+  </div>
+  <div class="crew-card fade-in fade-in-delay-6">
+    <div class="crew-header">
+      <span style="font-size:16px;">👨‍🚀</span>
+      <span class="crew-count">7名が滞在中 — 第73次長期滞在</span>
+    </div>
+    <div class="crew-grid">
+      <div class="crew-member">
+        <span class="crew-flag">🇺🇸</span>
+        <span class="crew-name">M. ドミニク（船長）</span>
+      </div>
+      <div class="crew-member">
+        <span class="crew-flag">🇷🇺</span>
+        <span class="crew-name">O. コノネンコ</span>
+      </div>
+      <div class="crew-member">
+        <span class="crew-flag">🇯🇵</span>
+        <span class="crew-name">古川 聡</span>
+      </div>
+      <div class="crew-member">
+        <span class="crew-flag">🇺🇸</span>
+        <span class="crew-name">L. オハラ</span>
+      </div>
+      <div class="crew-member">
+        <span class="crew-flag">🇩🇰</span>
+        <span class="crew-name">A. モーゲンセン</span>
+      </div>
+      <div class="crew-member">
+        <span class="crew-flag">🇷🇺</span>
+        <span class="crew-name">N. チホノフ</span>
+      </div>
+      <div class="crew-member">
+        <span class="crew-flag">🇺🇸</span>
+        <span class="crew-name">J. モグベリ</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Fun fact -->
+  <div class="fun-fact fade-in fade-in-delay-7">
+    <div class="fun-fact-label">TODAY'S FACT</div>
+    <div class="fun-fact-text">
+      ISSは今日だけで約700,000km移動します。これは地球から月まで往復するのとほぼ同じ距離です。乗組員たちは1日に16回の日の出と日の入りを体験しています。
+    </div>
+  </div>
+
+  <div class="bottom-spacer"></div>
+
+  <!-- Bottom Navigation -->
+  <nav class="bottom-nav">
+    <div class="nav-item active">
+      <span class="nav-icon">📡</span>
+      <span>今日の旅</span>
+    </div>
+    <div class="nav-item">
+      <span class="nav-icon">🗓️</span>
+      <span>可視予報</span>
+    </div>
+    <div class="nav-item">
+      <span class="nav-icon">🛰️</span>
+      <span>みちびき</span>
+    </div>
+    <div class="nav-item">
+      <span class="nav-icon">⚙️</span>
+      <span>設定</span>
+    </div>
+  </nav>
+
+</div>
+
+<script>
+  // Simulate ISS position update
+  const locations = [
+    { name: '南太平洋上空', detail: '高度 408km / 27,600km/h', badge: 'day', badgeText: '☀️ 昼側' },
+    { name: 'チリ沖 上空', detail: '高度 410km / 27,580km/h', badge: 'day', badgeText: '☀️ 昼側' },
+    { name: '南大西洋上空', detail: '高度 407km / 27,610km/h', badge: 'night', badgeText: '🌙 夜側' },
+    { name: 'アフリカ西岸上空', detail: '高度 411km / 27,590km/h', badge: 'night', badgeText: '🌙 夜側' },
+    { name: 'インド洋上空', detail: '高度 409km / 27,600km/h', badge: 'day', badgeText: '☀️ 昼側' },
+  ];
+
+  let locIndex = 0;
+
+  setInterval(() => {
+    locIndex = (locIndex + 1) % locations.length;
+    const loc = locations[locIndex];
+
+    const nameEl = document.querySelector('.iss-now-location');
+    const detailEl = document.querySelector('.iss-now-detail');
+    const badgeEl = document.querySelector('.day-night-badge');
+
+    nameEl.style.opacity = 0;
+    detailEl.style.opacity = 0;
+
+    setTimeout(() => {
+      nameEl.textContent = loc.name;
+      detailEl.textContent = loc.detail;
+      badgeEl.className = 'day-night-badge ' + loc.badge;
+      badgeEl.textContent = loc.badgeText;
+      nameEl.style.opacity = 1;
+      detailEl.style.opacity = 1;
+    }, 300);
+  }, 5000);
+
+  // Smooth opacity transitions
+  document.querySelector('.iss-now-location').style.transition = 'opacity 0.3s';
+  document.querySelector('.iss-now-detail').style.transition = 'opacity 0.3s';
+
+  // Move ISS marker on map
+  const marker = document.querySelector('.map-iss-marker');
+  const label = marker.nextElementSibling;
+  let mapPos = 45;
+
+  setInterval(() => {
+    mapPos += 2;
+    if (mapPos > 90) mapPos = 10;
+    const yPos = 40 + 30 * Math.sin((mapPos / 100) * Math.PI * 2);
+    marker.style.left = mapPos + '%';
+    marker.style.top = yPos + '%';
+    label.style.left = (mapPos + 3) + '%';
+    label.style.top = (yPos + 4) + '%';
+  }, 3000);
+
+  // Countdown timer simulation
+  let countdown = 47;
+  const countdownEl = document.querySelector('.countdown-text strong');
+  setInterval(() => {
+    countdown--;
+    if (countdown <= 0) countdown = 92;
+    countdownEl.textContent = countdown + '分';
+  }, 60000);
+</script>
+</body>
+</html>

@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="96" fill="#06081a"/>
+  <!-- Stars -->
+  <circle cx="80" cy="60" r="2" fill="rgba(255,255,255,0.4)"/>
+  <circle cx="420" cy="90" r="1.5" fill="rgba(255,255,255,0.3)"/>
+  <circle cx="150" cy="430" r="1.5" fill="rgba(255,255,255,0.35)"/>
+  <circle cx="380" cy="400" r="2" fill="rgba(255,255,255,0.25)"/>
+  <circle cx="60" cy="250" r="1" fill="rgba(255,255,255,0.3)"/>
+  <circle cx="450" cy="280" r="1.5" fill="rgba(255,255,255,0.2)"/>
+  <!-- Figure-8 orbit path -->
+  <path d="M 256,120 C 340,120 360,200 256,256 C 152,312 172,392 256,392 C 340,392 360,312 256,256 C 152,200 172,120 256,120"
+        stroke="#ffd54f" stroke-width="3" fill="none" opacity="0.4" stroke-dasharray="8,6"/>
+  <!-- Satellite dot (gold, glowing) -->
+  <circle cx="256" cy="140" r="14" fill="#ffd54f" opacity="0.15"/>
+  <circle cx="256" cy="140" r="8" fill="#ffd54f"/>
+  <!-- Japan silhouette (simplified) -->
+  <g opacity="0.15" fill="white">
+    <ellipse cx="270" cy="220" rx="12" ry="30"/>
+    <ellipse cx="258" cy="245" rx="8" ry="15" transform="rotate(-15,258,245)"/>
+    <ellipse cx="248" cy="268" rx="6" ry="10" transform="rotate(-30,248,268)"/>
+  </g>
+  <!-- Text -->
+  <text x="256" y="340" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="48" font-weight="300" fill="white" letter-spacing="4">ORBIT</text>
+  <text x="256" y="385" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="42" font-weight="700" fill="#ffd54f" letter-spacing="6">DIARY</text>
+</svg>

@@ -1,0 +1,925 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Orbit Diary — ISSが今日見てきたもの</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&family=Noto+Serif+JP:wght@300;400;500;700&family=Space+Mono:wght@400;700&display=swap');
+
+  :root {
+    --bg: #080c16;
+    --bg-card: rgba(255,255,255,0.035);
+    --border: rgba(255,255,255,0.07);
+    --text: #e4e7f0;
+    --text-sub: rgba(255,255,255,0.5);
+    --text-dim: rgba(255,255,255,0.25);
+    --blue: #64b5f6;
+    --gold: #ffd54f;
+    --green: #81c784;
+    --pink: #f48fb1;
+    --orange: #ffab91;
+    --purple: #b39ddb;
+    --red: #ef9a9a;
+    --cyan: #80deea;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Noto Sans JP', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(1px 1px at 8% 15%, rgba(255,255,255,0.4), transparent),
+      radial-gradient(1px 1px at 22% 55%, rgba(255,255,255,0.2), transparent),
+      radial-gradient(1.5px 1.5px at 45% 8%, rgba(255,255,255,0.5), transparent),
+      radial-gradient(1px 1px at 68% 72%, rgba(255,255,255,0.3), transparent),
+      radial-gradient(1px 1px at 85% 30%, rgba(255,255,255,0.25), transparent),
+      radial-gradient(1px 1px at 15% 85%, rgba(255,255,255,0.2), transparent),
+      radial-gradient(1.5px 1.5px at 55% 45%, rgba(255,255,255,0.35), transparent),
+      radial-gradient(1px 1px at 92% 65%, rgba(255,255,255,0.15), transparent);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .app {
+    max-width: 430px;
+    margin: 0 auto;
+    min-height: 100vh;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Header */
+  .header {
+    padding: 52px 24px 20px;
+    text-align: center;
+    position: relative;
+  }
+
+  .header::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 24px; right: 24px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--border), transparent);
+  }
+
+  .date-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 2px;
+    color: var(--text-dim);
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border);
+    padding: 5px 14px;
+    border-radius: 20px;
+    margin-bottom: 16px;
+  }
+
+  .main-title {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 24px;
+    font-weight: 400;
+    line-height: 1.7;
+    color: var(--text);
+    letter-spacing: 1px;
+  }
+
+  .main-title strong {
+    font-weight: 700;
+    color: var(--blue);
+  }
+
+  .main-sub {
+    font-size: 13px;
+    color: var(--text-sub);
+    margin-top: 10px;
+    line-height: 1.6;
+    font-weight: 300;
+  }
+
+  .main-sub strong {
+    color: var(--gold);
+    font-weight: 500;
+  }
+
+  /* Narrative summary */
+  .narrative-summary {
+    margin: 24px 24px 0;
+    padding: 20px;
+    background: linear-gradient(135deg, rgba(100,181,246,0.06), transparent);
+    border: 1px solid rgba(100,181,246,0.12);
+    border-radius: 16px;
+    position: relative;
+  }
+
+  .narrative-quote {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 15px;
+    line-height: 2;
+    color: var(--text);
+    font-weight: 300;
+  }
+
+  .narrative-quote em {
+    font-style: normal;
+    color: var(--blue);
+    font-weight: 500;
+  }
+
+  .narrative-quote .gold { color: var(--gold); }
+  .narrative-quote .green { color: var(--green); }
+  .narrative-quote .pink { color: var(--pink); }
+
+  .narrative-speaker {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 14px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border);
+  }
+
+  .speaker-dot {
+    width: 8px; height: 8px;
+    background: var(--blue);
+    border-radius: 50%;
+    box-shadow: 0 0 8px rgba(100,181,246,0.5);
+  }
+
+  .speaker-name {
+    font-size: 11px;
+    color: var(--text-sub);
+    font-family: 'Space Mono', monospace;
+    letter-spacing: 1px;
+  }
+
+  /* Diary entries */
+  .diary-section {
+    margin: 28px 24px 0;
+  }
+
+  .diary-section-title {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-sub);
+    letter-spacing: 1px;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .diary-section-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  .diary-entry {
+    margin-bottom: 20px;
+    position: relative;
+  }
+
+  .diary-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+    transition: transform 0.2s;
+  }
+
+  /* Photo/visual area */
+  .diary-visual {
+    height: 160px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .diary-visual-gradient {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+  }
+
+  .diary-visual-label {
+    position: absolute;
+    bottom: 12px;
+    left: 14px;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .visual-badge {
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: 10px;
+    font-weight: 500;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+
+  .diary-time-badge {
+    position: absolute;
+    top: 12px;
+    right: 14px;
+    z-index: 2;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: rgba(255,255,255,0.7);
+    background: rgba(0,0,0,0.5);
+    backdrop-filter: blur(8px);
+    padding: 3px 10px;
+    border-radius: 12px;
+  }
+
+  .diary-body {
+    padding: 16px 18px;
+  }
+
+  .diary-location {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 4px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .diary-location-flag {
+    font-size: 18px;
+  }
+
+  .diary-coords {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--text-dim);
+    margin-bottom: 10px;
+  }
+
+  .diary-narrative {
+    font-size: 14px;
+    line-height: 1.85;
+    color: var(--text-sub);
+    font-weight: 300;
+  }
+
+  .diary-narrative em {
+    font-style: normal;
+    font-weight: 500;
+  }
+
+  .diary-narrative em.blue { color: var(--blue); }
+  .diary-narrative em.gold { color: var(--gold); }
+  .diary-narrative em.green { color: var(--green); }
+  .diary-narrative em.pink { color: var(--pink); }
+  .diary-narrative em.orange { color: var(--orange); }
+  .diary-narrative em.purple { color: var(--purple); }
+  .diary-narrative em.red { color: var(--red); }
+  .diary-narrative em.cyan { color: var(--cyan); }
+
+  /* Event tag */
+  .diary-event {
+    margin-top: 12px;
+    padding: 10px 14px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .event-icon {
+    font-size: 18px;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  .event-content {
+    flex: 1;
+  }
+
+  .event-title {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text);
+    margin-bottom: 2px;
+  }
+
+  .event-desc {
+    font-size: 11px;
+    color: var(--text-sub);
+    line-height: 1.5;
+  }
+
+  .event-source {
+    font-size: 9px;
+    color: var(--text-dim);
+    margin-top: 4px;
+    font-family: 'Space Mono', monospace;
+  }
+
+  /* Visual styles for different scenes */
+  .vis-sunrise {
+    background: linear-gradient(180deg, #1a1a3e 0%, #2d1b4e 30%, #e85d3a 70%, #f4a460 100%);
+  }
+
+  .vis-ocean {
+    background: linear-gradient(180deg, #0a1628 0%, #0d2847 40%, #1a4a7a 70%, #1e5f8a 100%);
+  }
+
+  .vis-city-night {
+    background: linear-gradient(180deg, #0a0e1a 0%, #0f1525 50%, #1a1f30 100%);
+  }
+
+  .vis-city-night::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(1px 1px at 20% 60%, rgba(255,200,80,0.8), transparent),
+      radial-gradient(1px 1px at 35% 55%, rgba(255,200,80,0.6), transparent),
+      radial-gradient(1px 1px at 50% 65%, rgba(255,200,80,0.7), transparent),
+      radial-gradient(1px 1px at 65% 58%, rgba(255,200,80,0.5), transparent),
+      radial-gradient(1px 1px at 80% 62%, rgba(255,200,80,0.6), transparent),
+      radial-gradient(2px 2px at 25% 50%, rgba(255,220,100,0.9), transparent),
+      radial-gradient(2px 2px at 55% 52%, rgba(255,220,100,0.8), transparent),
+      radial-gradient(1px 1px at 40% 70%, rgba(255,180,60,0.5), transparent),
+      radial-gradient(1px 1px at 70% 68%, rgba(255,180,60,0.4), transparent),
+      radial-gradient(3px 3px at 45% 55%, rgba(255,240,120,0.4), transparent);
+  }
+
+  .vis-storm {
+    background: linear-gradient(180deg, #1a1a2e 0%, #2a2a40 30%, #3d3d55 60%, #4a4a60 100%);
+  }
+
+  .vis-storm::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(60px 60px at 55% 50%, rgba(255,255,255,0.08), transparent),
+      radial-gradient(40px 40px at 50% 55%, rgba(255,255,255,0.05), transparent);
+    animation: stormSwirl 8s ease-in-out infinite;
+  }
+
+  @keyframes stormSwirl {
+    0%, 100% { transform: rotate(0deg) scale(1); }
+    50% { transform: rotate(5deg) scale(1.05); }
+  }
+
+  .vis-japan {
+    background: linear-gradient(180deg, #0a1628 0%, #1a3050 30%, #2a5070 60%, #3a7090 100%);
+  }
+
+  .vis-aurora {
+    background: linear-gradient(180deg, #0a0e1a 0%, #0d1a2a 30%, #0a2a1a 60%, #0d1a2a 100%);
+  }
+
+  .vis-aurora::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(170deg, transparent 20%, rgba(100,255,150,0.08) 40%, rgba(80,200,255,0.06) 60%, transparent 80%);
+    animation: auroraPulse 6s ease-in-out infinite;
+  }
+
+  @keyframes auroraPulse {
+    0%, 100% { opacity: 0.5; transform: translateX(-5px); }
+    50% { opacity: 1; transform: translateX(5px); }
+  }
+
+  .vis-desert {
+    background: linear-gradient(180deg, #1a2040 0%, #3a3020 40%, #5a4830 70%, #6a5840 100%);
+  }
+
+  .vis-mountain {
+    background: linear-gradient(180deg, #0a1020 0%, #1a2040 40%, #2a3050 100%);
+  }
+
+  .vis-mountain::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 60%;
+    background: linear-gradient(180deg, transparent, rgba(255,255,255,0.03));
+    clip-path: polygon(0% 100%, 15% 40%, 30% 70%, 45% 20%, 60% 60%, 75% 30%, 90% 55%, 100% 100%);
+  }
+
+  /* Now section */
+  .now-card {
+    margin: 24px 24px 0;
+    padding: 18px 20px;
+    background: linear-gradient(135deg, rgba(100,181,246,0.1), rgba(100,181,246,0.02));
+    border: 1px solid rgba(100,181,246,0.2);
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .now-dot-wrap {
+    position: relative;
+    width: 40px;
+    height: 40px;
+    flex-shrink: 0;
+  }
+
+  .now-dot {
+    width: 10px; height: 10px;
+    background: var(--blue);
+    border-radius: 50%;
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    box-shadow: 0 0 12px rgba(100,181,246,0.6);
+  }
+
+  .now-dot::after {
+    content: '';
+    position: absolute;
+    inset: -6px;
+    border: 1.5px solid rgba(100,181,246,0.3);
+    border-radius: 50%;
+    animation: pulse 2s ease-out infinite;
+  }
+
+  @keyframes pulse {
+    0% { transform: scale(1); opacity: 1; }
+    100% { transform: scale(2.5); opacity: 0; }
+  }
+
+  .now-text {
+    flex: 1;
+  }
+
+  .now-label {
+    font-size: 10px;
+    color: var(--blue);
+    font-weight: 500;
+    letter-spacing: 1.5px;
+    margin-bottom: 3px;
+  }
+
+  .now-location {
+    font-size: 14px;
+    font-weight: 500;
+  }
+
+  .now-detail {
+    font-size: 11px;
+    color: var(--text-sub);
+    margin-top: 1px;
+  }
+
+  .now-writing {
+    flex-shrink: 0;
+    font-size: 11px;
+    color: var(--text-dim);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .writing-dots span {
+    display: inline-block;
+    width: 4px;
+    height: 4px;
+    background: var(--blue);
+    border-radius: 50%;
+    animation: writeDot 1.4s ease-in-out infinite;
+  }
+
+  .writing-dots span:nth-child(2) { animation-delay: 0.2s; }
+  .writing-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+  @keyframes writeDot {
+    0%, 80%, 100% { opacity: 0.2; }
+    40% { opacity: 1; }
+  }
+
+  /* Tonight teaser */
+  .tonight-teaser {
+    margin: 20px 24px 0;
+    padding: 16px 20px;
+    background: linear-gradient(135deg, rgba(255,213,79,0.08), transparent);
+    border: 1px solid rgba(255,213,79,0.12);
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .tonight-text {
+    font-size: 13px;
+    color: var(--text-sub);
+  }
+
+  .tonight-text strong {
+    color: var(--gold);
+    font-family: 'Space Mono', monospace;
+  }
+
+  .tonight-btn {
+    padding: 7px 14px;
+    background: rgba(255,213,79,0.12);
+    border: 1px solid rgba(255,213,79,0.25);
+    border-radius: 20px;
+    color: var(--gold);
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    font-family: 'Noto Sans JP', sans-serif;
+    white-space: nowrap;
+  }
+
+  /* Stats strip */
+  .stats-strip {
+    display: flex;
+    gap: 1px;
+    margin: 20px 24px 0;
+    background: var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  .stat-cell {
+    flex: 1;
+    padding: 14px 8px;
+    background: var(--bg);
+    text-align: center;
+  }
+
+  .stat-cell:first-child { border-radius: 12px 0 0 12px; }
+  .stat-cell:last-child { border-radius: 0 12px 12px 0; }
+
+  .stat-num {
+    font-family: 'Space Mono', monospace;
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .stat-label {
+    font-size: 9px;
+    color: var(--text-dim);
+    letter-spacing: 0.5px;
+  }
+
+  /* Bottom nav */
+  .bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 430px;
+    background: rgba(8,12,22,0.92);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-around;
+    padding: 10px 0 28px;
+    z-index: 100;
+  }
+
+  .nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    font-size: 10px;
+    color: var(--text-dim);
+    cursor: pointer;
+    padding: 4px 12px;
+  }
+
+  .nav-item.active { color: var(--blue); }
+  .nav-item .nav-icon { font-size: 20px; }
+
+  .bottom-spacer { height: 80px; }
+
+  /* Animations */
+  .fade-in { animation: fadeIn 0.6s ease-out both; }
+  .d1 { animation-delay: 0.1s; } .d2 { animation-delay: 0.15s; }
+  .d3 { animation-delay: 0.2s; } .d4 { animation-delay: 0.25s; }
+  .d5 { animation-delay: 0.3s; } .d6 { animation-delay: 0.35s; }
+  .d7 { animation-delay: 0.4s; } .d8 { animation-delay: 0.45s; }
+  .d9 { animation-delay: 0.5s; } .d10 { animation-delay: 0.55s; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  ::-webkit-scrollbar { width: 0; }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- Header -->
+  <div class="header fade-in">
+    <div class="date-chip">🛰 2026年4月18日の日記</div>
+    <h1 class="main-title">
+      今日、<strong>ISS</strong>は<br>
+      こんな地球を見てきました
+    </h1>
+    <p class="main-sub">
+      9周目を旅行中。<strong>32カ国</strong>の上空を通過、<strong>14回</strong>の日の出を見ました
+    </p>
+  </div>
+
+  <!-- Narrative summary -->
+  <div class="narrative-summary fade-in d1">
+    <div class="narrative-quote">
+      今朝はサハラの砂嵐を眼下に見ながら始まった。午後は<em>台風2号</em>のうずを真上から覗き込んだ。夕方、<span class="gold">東京の夕焼け</span>を一瞬だけ見て、今は<span class="green">オーロラ</span>の緑に包まれている。
+    </div>
+    <div class="narrative-speaker">
+      <div class="speaker-dot"></div>
+      <div class="speaker-name">ISS — 高度408km, 27,600km/hで飛行中</div>
+    </div>
+  </div>
+
+  <!-- Now -->
+  <div class="now-card fade-in d2">
+    <div class="now-dot-wrap">
+      <div class="now-dot"></div>
+    </div>
+    <div class="now-text">
+      <div class="now-label">LIVE — 次のページを書いている</div>
+      <div class="now-location">カナダ北部上空</div>
+      <div class="now-detail">オーロラオーバルの真上を通過中</div>
+    </div>
+    <div class="now-writing">
+      <div class="writing-dots">
+        <span></span><span></span><span></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-strip fade-in d3">
+    <div class="stat-cell">
+      <div class="stat-num" style="color:var(--blue);">14</div>
+      <div class="stat-label">日の出</div>
+    </div>
+    <div class="stat-cell">
+      <div class="stat-num" style="color:var(--gold);">32</div>
+      <div class="stat-label">通過国</div>
+    </div>
+    <div class="stat-cell">
+      <div class="stat-num" style="color:var(--green);">3</div>
+      <div class="stat-label">日本通過</div>
+    </div>
+    <div class="stat-cell">
+      <div class="stat-num" style="color:var(--pink);">5</div>
+      <div class="stat-label">地上イベント</div>
+    </div>
+  </div>
+
+  <!-- Diary entries -->
+  <div class="diary-section fade-in d4">
+    <div class="diary-section-title">今日の日記</div>
+  </div>
+
+  <!-- Entry 1: Sunrise over Sahara -->
+  <div class="diary-entry fade-in d4" style="margin:0 24px 20px;">
+    <div class="diary-card">
+      <div class="diary-visual vis-sunrise">
+        <div class="diary-visual-gradient" style="background:linear-gradient(0deg, rgba(8,12,22,0.8) 0%, transparent 50%);"></div>
+        <div class="diary-time-badge">05:12 JST</div>
+        <div class="diary-visual-label">
+          <div class="visual-badge" style="background:rgba(255,160,80,0.3);color:var(--orange);">🌅 8回目の日の出</div>
+        </div>
+      </div>
+      <div class="diary-body">
+        <div class="diary-location">
+          <span class="diary-location-flag">🇲🇷</span>
+          モーリタニア → マリ上空
+        </div>
+        <div class="diary-coords">20.5°N, 10.3°W → 15.2°N, 1.8°W</div>
+        <div class="diary-narrative">
+          大気の縁が<em class="orange">オレンジから青へ</em>にじむ。地球の輪郭が光に溶ける瞬間。眼下のサハラ砂漠は朝日を受けて<em class="gold">一面の金色</em>に変わった。地平線に影を引く砂丘のパターンが、この高度からでも見える。
+        </div>
+        <div class="diary-event">
+          <div class="event-icon">🌪️</div>
+          <div class="event-content">
+            <div class="event-title">サハラ砂塵嵐が発生中</div>
+            <div class="event-desc">チャド〜ニジェール間で大規模な砂塵嵐。幅400km以上の茶色い帯が西へ移動中。この砂塵は数日後にカリブ海まで届く可能性がある。</div>
+            <div class="event-source">SOURCE: NASA EOSDIS Worldview / MODIS</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Entry 2: Typhoon -->
+  <div class="diary-entry fade-in d5" style="margin:0 24px 20px;">
+    <div class="diary-card">
+      <div class="diary-visual vis-storm">
+        <div class="diary-visual-gradient" style="background:linear-gradient(0deg, rgba(8,12,22,0.8) 0%, transparent 50%);"></div>
+        <div class="diary-time-badge">09:34 JST</div>
+        <div class="diary-visual-label">
+          <div class="visual-badge" style="background:rgba(239,154,154,0.3);color:var(--red);">🌀 台風直上通過</div>
+        </div>
+      </div>
+      <div class="diary-body">
+        <div class="diary-location">
+          <span class="diary-location-flag">🌊</span>
+          フィリピン海 上空
+        </div>
+        <div class="diary-coords">18.3°N, 132.7°E</div>
+        <div class="diary-narrative">
+          <em class="red">台風2号（サンヴー）</em>の目をほぼ真上から見下ろした。直径30kmの目の中は不気味なほど穏やかで、その周囲を<em class="cyan">白い壁雲</em>が渦巻いている。窓から見える最もドラマチックな気象現象のひとつ。
+        </div>
+        <div class="diary-event">
+          <div class="event-icon">⚠️</div>
+          <div class="event-content">
+            <div class="event-title">台風2号 — カテゴリ3に発達</div>
+            <div class="event-desc">中心気圧 955hPa、最大風速 50m/s。来週初めに沖縄に接近の可能性。現在フィリピン海を北西に時速20kmで移動中。</div>
+            <div class="event-source">SOURCE: 気象庁台風情報 / JTWC</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Entry 3: Japan pass -->
+  <div class="diary-entry fade-in d6" style="margin:0 24px 20px;">
+    <div class="diary-card">
+      <div class="diary-visual vis-japan">
+        <div class="diary-visual-gradient" style="background:linear-gradient(0deg, rgba(8,12,22,0.8) 0%, transparent 50%);"></div>
+        <div class="diary-time-badge">12:47 JST</div>
+        <div class="diary-visual-label">
+          <div class="visual-badge" style="background:rgba(100,181,246,0.3);color:var(--blue);">🇯🇵 日本通過 3/3回目</div>
+        </div>
+      </div>
+      <div class="diary-body">
+        <div class="diary-location">
+          <span class="diary-location-flag">🗾</span>
+          九州 → 東北 → 北海道
+        </div>
+        <div class="diary-coords">31.6°N, 130.7°E → 43.1°N, 141.3°E</div>
+        <div class="diary-narrative">
+          今日3度目の日本。<em class="blue">博多湾</em>から入って、<em class="blue">瀬戸内海の島々</em>が箱庭のように並ぶのが見えた。関東平野は薄い雲に覆われていたが、<em class="gold">富士山の頂上</em>だけが雲の上に突き出していた。約4分で列島を縦断。
+        </div>
+        <div class="diary-event">
+          <div class="event-icon">⚾</div>
+          <div class="event-content">
+            <div class="event-title">甲子園で春のセンバツ開催中</div>
+            <div class="event-desc">通過時刻にちょうど第2試合の7回が進行中。球場上空は快晴。ISSからは甲子園は見えないが、大阪湾の形ははっきりと見えた。</div>
+            <div class="event-source">SOURCE: NHKスポーツ / 気象庁天気図</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Entry 4: Night cities -->
+  <div class="diary-entry fade-in d7" style="margin:0 24px 20px;">
+    <div class="diary-card">
+      <div class="diary-visual vis-city-night">
+        <div class="diary-visual-gradient" style="background:linear-gradient(0deg, rgba(8,12,22,0.7) 0%, transparent 60%);"></div>
+        <div class="diary-time-badge">16:23 JST</div>
+        <div class="diary-visual-label">
+          <div class="visual-badge" style="background:rgba(255,213,79,0.3);color:var(--gold);">🌃 ヨーロッパの夜景</div>
+        </div>
+      </div>
+      <div class="diary-body">
+        <div class="diary-location">
+          <span class="diary-location-flag">🇪🇺</span>
+          西ヨーロッパ上空
+        </div>
+        <div class="diary-coords">48.9°N, 2.3°E → 52.5°N, 13.4°E</div>
+        <div class="diary-narrative">
+          地球の夜側に入った。眼下にヨーロッパの<em class="gold">光の網</em>が広がる。パリの放射状道路が<em class="gold">光の蜘蛛の巣</em>のように見える。ロンドン、ブリュッセル、アムステルダムが光の帯でつながっている。国境は見えないが、<em class="purple">街の光り方の密度</em>で都市の位置がわかる。
+        </div>
+        <div class="diary-event">
+          <div class="event-icon">⚽</div>
+          <div class="event-content">
+            <div class="event-title">UEFAチャンピオンズリーグ準決勝</div>
+            <div class="event-desc">パリのパルク・デ・プランスでPSG対バイエルン。7万人のスタジアムの光は、この高度からは街のひとつの光点にしか見えない。けれど確かにそこで歓声が上がっている。</div>
+            <div class="event-source">SOURCE: UEFA.com / ISS通過時刻照合</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Entry 5: Aurora -->
+  <div class="diary-entry fade-in d8" style="margin:0 24px 20px;">
+    <div class="diary-card">
+      <div class="diary-visual vis-aurora">
+        <div class="diary-visual-gradient" style="background:linear-gradient(0deg, rgba(8,12,22,0.6) 0%, transparent 60%);"></div>
+        <div class="diary-time-badge">17:45 JST — NOW</div>
+        <div class="diary-visual-label">
+          <div class="visual-badge" style="background:rgba(129,199,132,0.3);color:var(--green);">✨ オーロラ遭遇</div>
+        </div>
+      </div>
+      <div class="diary-body">
+        <div class="diary-location">
+          <span class="diary-location-flag">🇨🇦</span>
+          カナダ北部 — イエローナイフ上空
+        </div>
+        <div class="diary-coords">62.5°N, 114.4°W</div>
+        <div class="diary-narrative">
+          いま、まさに<em class="green">オーロラ</em>の中を飛んでいる。ISSの高度は400kmで、オーロラは100〜300kmで光る。つまり、<em class="cyan">オーロラを見下ろしている</em>。地上から見上げるカーテンが、ここからは<em class="green">地球に貼り付いた緑の霧</em>のように見える。
+        </div>
+        <div class="diary-event">
+          <div class="event-icon">☀️</div>
+          <div class="event-content">
+            <div class="event-title">太陽フレア（M5.2クラス）の影響</div>
+            <div class="event-desc">2日前の太陽フレアによるCME（コロナ質量放出）が地球に到達中。Kp指数6。通常より南の緯度でもオーロラ観測の可能性がある。北海道でも見えるかもしれない。</div>
+            <div class="event-source">SOURCE: NOAA SWPC / 国立天文台</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Entry 6: Desert and ancient site -->
+  <div class="diary-entry fade-in d9" style="margin:0 24px 20px;">
+    <div class="diary-card">
+      <div class="diary-visual vis-desert">
+        <div class="diary-visual-gradient" style="background:linear-gradient(0deg, rgba(8,12,22,0.8) 0%, transparent 50%);"></div>
+        <div class="diary-time-badge">07:58 JST</div>
+        <div class="diary-visual-label">
+          <div class="visual-badge" style="background:rgba(255,171,145,0.3);color:var(--orange);">🏛️ 文明の痕跡</div>
+        </div>
+      </div>
+      <div class="diary-body">
+        <div class="diary-location">
+          <span class="diary-location-flag">🇪🇬</span>
+          エジプト上空
+        </div>
+        <div class="diary-coords">29.9°N, 31.1°E</div>
+        <div class="diary-narrative">
+          ナイル川が<em class="green">砂漠に引かれた一本の緑の線</em>のように見える。その線が途切れる場所に広がるのがカイロ。ギザのピラミッドはこの高度からは点にすら見えない。でも4,500年前の人間が積み上げた石が、<em class="orange">今もそこにある</em>という事実が、なぜか目に焼きつく。
+        </div>
+        <div class="diary-event">
+          <div class="event-icon">🏗️</div>
+          <div class="event-content">
+            <div class="event-title">大エジプト博物館が今年グランドオープン</div>
+            <div class="event-desc">ピラミッドの隣に建設された世界最大の考古学博物館。ツタンカーメンの全コレクションを初めて一堂に展示。通過時の太陽角度で、建物の影が砂漠に長く伸びていたはず。</div>
+            <div class="event-source">SOURCE: GEM公式 / Google Earth照合</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tonight teaser -->
+  <div class="tonight-teaser fade-in d10">
+    <div class="tonight-text">
+      今夜 <strong>19:23</strong> に東京上空を通過<br>
+      <span style="font-size:11px;color:var(--text-dim);">北西の空、金星級の明るさで5分12秒</span>
+    </div>
+    <div class="tonight-btn">🔔 通知する</div>
+  </div>
+
+  <div class="bottom-spacer"></div>
+
+  <nav class="bottom-nav">
+    <div class="nav-item active">
+      <span class="nav-icon">📖</span>
+      <span>今日の日記</span>
+    </div>
+    <div class="nav-item">
+      <span class="nav-icon">📅</span>
+      <span>過去の日記</span>
+    </div>
+    <div class="nav-item">
+      <span class="nav-icon">🛰️</span>
+      <span>みちびき</span>
+    </div>
+    <div class="nav-item">
+      <span class="nav-icon">⚙️</span>
+      <span>設定</span>
+    </div>
+  </nav>
+
+</div>
+</body>
+</html>

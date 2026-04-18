@@ -1,0 +1,1166 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Orbit Diary — みちびき空番</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&family=Space+Mono:wght@400;700&display=swap');
+
+  :root {
+    --bg-deep: #0b0d1a;
+    --bg-card: rgba(255,255,255,0.04);
+    --border: rgba(255,255,255,0.08);
+    --text-primary: #e8eaf6;
+    --text-secondary: rgba(255,255,255,0.55);
+    --text-dim: rgba(255,255,255,0.3);
+    --qzs-gold: #ffd54f;
+    --qzs-gold-dim: rgba(255,213,79,0.15);
+    --qzs-blue: #64b5f6;
+    --qzs-indigo: #9fa8da;
+    --qzs-green: #81c784;
+    --qzs-red: #ef9a9a;
+    --qzs-purple: #ce93d8;
+    --qzs-orange: #ffab91;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Noto Sans JP', sans-serif;
+    background: var(--bg-deep);
+    color: var(--text-primary);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(1px 1px at 12% 25%, rgba(255,255,255,0.35), transparent),
+      radial-gradient(1px 1px at 28% 65%, rgba(255,255,255,0.25), transparent),
+      radial-gradient(1.5px 1.5px at 48% 12%, rgba(255,255,255,0.5), transparent),
+      radial-gradient(1px 1px at 72% 78%, rgba(255,255,255,0.2), transparent),
+      radial-gradient(1px 1px at 88% 38%, rgba(255,255,255,0.35), transparent),
+      radial-gradient(1px 1px at 8% 88%, rgba(255,255,255,0.2), transparent),
+      radial-gradient(1px 1px at 55% 52%, rgba(255,255,255,0.15), transparent),
+      radial-gradient(1.5px 1.5px at 35% 42%, rgba(255,255,255,0.45), transparent),
+      radial-gradient(1px 1px at 65% 18%, rgba(255,255,255,0.3), transparent),
+      radial-gradient(1px 1px at 92% 72%, rgba(255,255,255,0.2), transparent);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .app {
+    max-width: 430px;
+    margin: 0 auto;
+    min-height: 100vh;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Hero */
+  .hero {
+    padding: 48px 24px 28px;
+    text-align: center;
+    position: relative;
+  }
+
+  .hero::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 24px; right: 24px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--border), transparent);
+  }
+
+  .date-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 3px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .hero-title {
+    font-size: 26px;
+    font-weight: 300;
+    line-height: 1.6;
+  }
+
+  .hero-title strong {
+    font-weight: 700;
+    color: var(--qzs-gold);
+  }
+
+  .hero-sub {
+    font-size: 13px;
+    color: var(--text-secondary);
+    font-weight: 300;
+    margin-top: 8px;
+    line-height: 1.6;
+  }
+
+  /* On-duty card */
+  .duty-card {
+    margin: 24px 24px 0;
+    padding: 24px 20px;
+    background: linear-gradient(135deg, rgba(255,213,79,0.1), rgba(255,213,79,0.02));
+    border: 1px solid rgba(255,213,79,0.18);
+    border-radius: 18px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .duty-card::before {
+    content: '';
+    position: absolute;
+    top: -30px; right: -30px;
+    width: 100px; height: 100px;
+    background: radial-gradient(circle, rgba(255,213,79,0.12), transparent 70%);
+  }
+
+  .duty-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+
+  .duty-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 12px;
+    background: rgba(255,213,79,0.15);
+    border: 1px solid rgba(255,213,79,0.3);
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--qzs-gold);
+    letter-spacing: 0.5px;
+  }
+
+  .duty-shift {
+    font-size: 11px;
+    color: var(--text-dim);
+    font-family: 'Space Mono', monospace;
+  }
+
+  .duty-main {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+
+  .duty-sat-visual {
+    width: 72px;
+    height: 72px;
+    flex-shrink: 0;
+    position: relative;
+  }
+
+  .duty-figure8 {
+    width: 72px;
+    height: 72px;
+    position: absolute;
+    inset: 0;
+  }
+
+  .duty-figure8 svg {
+    width: 100%;
+    height: 100%;
+  }
+
+  .duty-sat-dot {
+    width: 10px;
+    height: 10px;
+    background: var(--qzs-gold);
+    border-radius: 50%;
+    position: absolute;
+    box-shadow: 0 0 10px rgba(255,213,79,0.6);
+    animation: figure8move 8s ease-in-out infinite;
+  }
+
+  @keyframes figure8move {
+    0%   { top: 10%; left: 50%; transform: translate(-50%, -50%); }
+    25%  { top: 35%; left: 70%; transform: translate(-50%, -50%); }
+    50%  { top: 55%; left: 50%; transform: translate(-50%, -50%); }
+    75%  { top: 75%; left: 30%; transform: translate(-50%, -50%); }
+    100% { top: 10%; left: 50%; transform: translate(-50%, -50%); }
+  }
+
+  .duty-info {
+    flex: 1;
+  }
+
+  .duty-name {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--qzs-gold);
+    margin-bottom: 2px;
+  }
+
+  .duty-name-sub {
+    font-size: 12px;
+    color: var(--text-secondary);
+    margin-bottom: 8px;
+  }
+
+  .duty-stats {
+    display: flex;
+    gap: 16px;
+  }
+
+  .duty-stat {
+    font-size: 11px;
+    color: var(--text-secondary);
+  }
+
+  .duty-stat strong {
+    color: var(--text-primary);
+    font-family: 'Space Mono', monospace;
+    font-weight: 700;
+  }
+
+  /* Zenith gauge */
+  .zenith-section {
+    margin: 20px 24px 0;
+    padding: 20px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+  }
+
+  .zenith-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+  }
+
+  .zenith-title {
+    font-size: 13px;
+    font-weight: 500;
+  }
+
+  .zenith-location {
+    font-size: 11px;
+    color: var(--text-dim);
+    background: rgba(255,255,255,0.06);
+    padding: 3px 10px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+  }
+
+  .zenith-gauge {
+    position: relative;
+    width: 100%;
+    height: 120px;
+    margin-bottom: 12px;
+  }
+
+  .zenith-arc {
+    width: 100%;
+    height: 100%;
+  }
+
+  .zenith-value {
+    position: absolute;
+    bottom: 4px;
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+  }
+
+  .zenith-angle {
+    font-family: 'Space Mono', monospace;
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--qzs-gold);
+    line-height: 1;
+  }
+
+  .zenith-label {
+    font-size: 11px;
+    color: var(--text-secondary);
+    margin-top: 2px;
+  }
+
+  .zenith-desc {
+    font-size: 12px;
+    color: var(--text-secondary);
+    text-align: center;
+    line-height: 1.6;
+  }
+
+  .zenith-desc em {
+    font-style: normal;
+    color: var(--qzs-gold);
+    font-weight: 500;
+  }
+
+  /* Shift schedule */
+  .shift-section {
+    margin: 20px 24px 0;
+  }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+  }
+
+  .section-title {
+    font-size: 15px;
+    font-weight: 500;
+  }
+
+  .section-more {
+    font-size: 11px;
+    color: var(--text-dim);
+  }
+
+  .shift-timeline {
+    position: relative;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 4px 16px;
+    overflow: hidden;
+  }
+
+  .shift-bar-bg {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 4px;
+    background: rgba(255,255,255,0.05);
+  }
+
+  .shift-bar-progress {
+    position: absolute;
+    top: 0; left: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--qzs-gold), rgba(255,213,79,0.3));
+    width: 62%;
+    border-radius: 0 2px 2px 0;
+  }
+
+  .shift-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+  }
+
+  .shift-item:last-child { border-bottom: none; }
+
+  .shift-sat-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 700;
+    flex-shrink: 0;
+    border: 2px solid;
+  }
+
+  .shift-sat-icon.on-duty {
+    background: rgba(255,213,79,0.15);
+    border-color: rgba(255,213,79,0.4);
+    color: var(--qzs-gold);
+    box-shadow: 0 0 12px rgba(255,213,79,0.2);
+  }
+
+  .shift-sat-icon.standby {
+    background: rgba(100,181,246,0.1);
+    border-color: rgba(100,181,246,0.25);
+    color: var(--qzs-blue);
+  }
+
+  .shift-sat-icon.geo {
+    background: rgba(206,147,216,0.1);
+    border-color: rgba(206,147,216,0.25);
+    color: var(--qzs-purple);
+  }
+
+  .shift-sat-icon.next {
+    background: rgba(129,199,132,0.1);
+    border-color: rgba(129,199,132,0.25);
+    color: var(--qzs-green);
+  }
+
+  .shift-info {
+    flex: 1;
+  }
+
+  .shift-name {
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 2px;
+  }
+
+  .shift-detail {
+    font-size: 11px;
+    color: var(--text-secondary);
+  }
+
+  .shift-status {
+    flex-shrink: 0;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+  }
+
+  .shift-status.active {
+    background: rgba(255,213,79,0.12);
+    color: var(--qzs-gold);
+    border: 1px solid rgba(255,213,79,0.25);
+  }
+
+  .shift-status.waiting {
+    background: rgba(129,199,132,0.1);
+    color: var(--qzs-green);
+    border: 1px solid rgba(129,199,132,0.2);
+  }
+
+  .shift-status.rest {
+    background: rgba(255,255,255,0.04);
+    color: var(--text-dim);
+    border: 1px solid var(--border);
+  }
+
+  .shift-status.geo-badge {
+    background: rgba(206,147,216,0.1);
+    color: var(--qzs-purple);
+    border: 1px solid rgba(206,147,216,0.2);
+  }
+
+  /* Figure 8 explainer */
+  .figure8-card {
+    margin: 20px 24px 0;
+    padding: 20px;
+    background: linear-gradient(135deg, rgba(159,168,218,0.08), rgba(159,168,218,0.02));
+    border: 1px solid rgba(159,168,218,0.15);
+    border-radius: 16px;
+  }
+
+  .figure8-header {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--qzs-indigo);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .figure8-visual {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+
+  .figure8-svg-container {
+    width: 100px;
+    height: 140px;
+    flex-shrink: 0;
+    position: relative;
+  }
+
+  .figure8-desc-list {
+    flex: 1;
+  }
+
+  .figure8-point {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    margin-bottom: 10px;
+    font-size: 12px;
+    color: var(--text-secondary);
+    line-height: 1.5;
+  }
+
+  .figure8-point:last-child { margin-bottom: 0; }
+
+  .figure8-bullet {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    margin-top: 5px;
+  }
+
+  /* Handoff section */
+  .handoff-card {
+    margin: 20px 24px 0;
+    padding: 20px;
+    background: linear-gradient(135deg, rgba(129,199,132,0.08), rgba(129,199,132,0.02));
+    border: 1px solid rgba(129,199,132,0.15);
+    border-radius: 16px;
+  }
+
+  .handoff-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+  }
+
+  .handoff-label {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--qzs-green);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .handoff-countdown {
+    font-family: 'Space Mono', monospace;
+    font-size: 13px;
+    color: var(--qzs-green);
+    font-weight: 700;
+  }
+
+  .handoff-visual {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 12px 0;
+  }
+
+  .handoff-sat {
+    text-align: center;
+  }
+
+  .handoff-sat-name {
+    font-size: 13px;
+    font-weight: 700;
+    margin-bottom: 2px;
+  }
+
+  .handoff-sat-role {
+    font-size: 10px;
+    color: var(--text-dim);
+  }
+
+  .handoff-arrow {
+    font-size: 20px;
+    color: var(--qzs-green);
+    animation: arrowPulse 2s ease-in-out infinite;
+  }
+
+  @keyframes arrowPulse {
+    0%, 100% { opacity: 0.4; }
+    50% { opacity: 1; }
+  }
+
+  .handoff-desc {
+    font-size: 12px;
+    color: var(--text-secondary);
+    text-align: center;
+    line-height: 1.6;
+    margin-top: 8px;
+  }
+
+  /* Service card */
+  .service-card {
+    margin: 20px 24px 0;
+    padding: 20px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+  }
+
+  .service-header {
+    font-size: 13px;
+    font-weight: 500;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .service-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .service-item {
+    padding: 14px 12px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    text-align: center;
+  }
+
+  .service-icon {
+    font-size: 20px;
+    margin-bottom: 6px;
+  }
+
+  .service-name {
+    font-size: 12px;
+    font-weight: 500;
+    margin-bottom: 3px;
+  }
+
+  .service-status {
+    font-size: 10px;
+    font-weight: 500;
+  }
+
+  .service-status.ok {
+    color: var(--qzs-green);
+  }
+
+  .service-status.sending {
+    color: var(--qzs-gold);
+  }
+
+  /* Constellation overview */
+  .constellation-card {
+    margin: 20px 24px 0;
+    padding: 20px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+  }
+
+  .constellation-header {
+    font-size: 13px;
+    font-weight: 500;
+    margin-bottom: 4px;
+  }
+
+  .constellation-sub {
+    font-size: 11px;
+    color: var(--text-dim);
+    margin-bottom: 14px;
+  }
+
+  .constellation-visual {
+    position: relative;
+    height: 200px;
+    margin-bottom: 12px;
+  }
+
+  /* Japan silhouette area */
+  .japan-center {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 50px;
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 36px;
+    opacity: 0.2;
+  }
+
+  .orbit-satellite {
+    position: absolute;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: 700;
+    transform: translate(-50%, -50%);
+    transition: all 3s ease-in-out;
+  }
+
+  .orbit-satellite .sat-label {
+    position: absolute;
+    bottom: -16px;
+    font-size: 9px;
+    color: var(--text-dim);
+    white-space: nowrap;
+    font-weight: 400;
+  }
+
+  .orbit-ring-qzo {
+    position: absolute;
+    top: 50%; left: 50%;
+    width: 160px;
+    height: 180px;
+    transform: translate(-50%, -50%);
+    border: 1px dashed rgba(255,213,79,0.15);
+    border-radius: 50%;
+  }
+
+  .orbit-ring-geo {
+    position: absolute;
+    top: 50%; left: 50%;
+    width: 260px;
+    height: 40px;
+    transform: translate(-50%, -50%);
+    border: 1px dashed rgba(206,147,216,0.12);
+    border-radius: 50%;
+  }
+
+  .orbit-type-label {
+    position: absolute;
+    font-size: 9px;
+    font-family: 'Space Mono', monospace;
+    letter-spacing: 1px;
+  }
+
+  .orbit-type-label.qzo {
+    color: rgba(255,213,79,0.3);
+    top: 8px; right: 20px;
+  }
+
+  .orbit-type-label.geo {
+    color: rgba(206,147,216,0.25);
+    bottom: 8px; left: 20px;
+  }
+
+  .constellation-legend {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 10px;
+    color: var(--text-dim);
+  }
+
+  .legend-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+  }
+
+  /* Fun fact */
+  .fun-fact {
+    margin: 20px 24px;
+    padding: 16px 20px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    border-left: 3px solid var(--qzs-orange);
+  }
+
+  .fun-fact-label {
+    font-size: 10px;
+    color: var(--qzs-orange);
+    font-weight: 500;
+    letter-spacing: 1px;
+    margin-bottom: 6px;
+  }
+
+  .fun-fact-text {
+    font-size: 13px;
+    line-height: 1.7;
+    color: var(--text-secondary);
+    font-weight: 300;
+  }
+
+  .fun-fact-text em {
+    font-style: normal;
+    color: var(--qzs-gold);
+    font-weight: 500;
+  }
+
+  /* Bottom nav */
+  .bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 430px;
+    background: rgba(11,13,26,0.92);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-around;
+    padding: 10px 0 28px;
+    z-index: 100;
+  }
+
+  .nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    font-size: 10px;
+    color: var(--text-dim);
+    cursor: pointer;
+    padding: 4px 12px;
+  }
+
+  .nav-item.active { color: var(--qzs-gold); }
+  .nav-item .nav-icon { font-size: 20px; }
+
+  .bottom-spacer { height: 80px; }
+
+  /* Animations */
+  .fade-in { animation: fadeIn 0.6s ease-out both; }
+  .d1 { animation-delay: 0.1s; }
+  .d2 { animation-delay: 0.2s; }
+  .d3 { animation-delay: 0.3s; }
+  .d4 { animation-delay: 0.4s; }
+  .d5 { animation-delay: 0.5s; }
+  .d6 { animation-delay: 0.6s; }
+  .d7 { animation-delay: 0.7s; }
+  .d8 { animation-delay: 0.8s; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  ::-webkit-scrollbar { width: 0; }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- Hero -->
+  <div class="hero fade-in">
+    <div class="date-label">2026年4月18日 金曜日</div>
+    <h1 class="hero-title">
+      いま日本の空を守っているのは<br><strong>みちびき3号機</strong>
+    </h1>
+    <p class="hero-sub">仰角 82° — ほぼ真上。あと3時間12分で4号機にバトンタッチ</p>
+  </div>
+
+  <!-- On-duty card -->
+  <div class="duty-card fade-in d1">
+    <div class="duty-header">
+      <div class="duty-badge">👑 当番衛星</div>
+      <div class="duty-shift">シフト 06:00–21:00 JST</div>
+    </div>
+    <div class="duty-main">
+      <div class="duty-sat-visual">
+        <div class="duty-figure8">
+          <svg viewBox="0 0 72 72" fill="none">
+            <path d="M 36,8 C 52,8 58,28 36,36 C 14,44 20,64 36,64 C 52,64 58,44 36,36 C 14,28 20,8 36,8"
+                  stroke="rgba(255,213,79,0.2)" stroke-width="1" stroke-dasharray="3,3"/>
+          </svg>
+        </div>
+        <div class="duty-sat-dot"></div>
+      </div>
+      <div class="duty-info">
+        <div class="duty-name">QZS-3（みちびき3号機）</div>
+        <div class="duty-name-sub">準天頂軌道衛星（QZO） / 2017年打上げ</div>
+        <div class="duty-stats">
+          <div class="duty-stat">仰角 <strong>82°</strong></div>
+          <div class="duty-stat">方位 <strong>南南西</strong></div>
+          <div class="duty-stat">高度 <strong>38,950km</strong></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Zenith gauge -->
+  <div class="zenith-section fade-in d2">
+    <div class="zenith-header">
+      <div class="zenith-title">天頂カバー状況</div>
+      <div class="zenith-location">東京基準</div>
+    </div>
+    <div class="zenith-gauge">
+      <svg class="zenith-arc" viewBox="0 0 300 140" fill="none">
+        <!-- Background arc -->
+        <path d="M 30,130 A 120,120 0 0,1 270,130" stroke="rgba(255,255,255,0.06)" stroke-width="16" stroke-linecap="round" fill="none"/>
+        <!-- Filled arc (82° → ~91%) -->
+        <path d="M 30,130 A 120,120 0 0,1 270,130" stroke="url(#gaugeGrad)" stroke-width="16" stroke-linecap="round" fill="none"
+              stroke-dasharray="377" stroke-dashoffset="34"/>
+        <!-- Tick marks -->
+        <text x="18" y="138" fill="rgba(255,255,255,0.2)" font-size="10" font-family="Space Mono">0°</text>
+        <text x="140" y="22" fill="rgba(255,255,255,0.2)" font-size="10" font-family="Space Mono" text-anchor="middle">90°</text>
+        <text x="272" y="138" fill="rgba(255,255,255,0.2)" font-size="10" font-family="Space Mono">0°</text>
+        <text x="55" y="52" fill="rgba(255,255,255,0.15)" font-size="9" font-family="Space Mono">70°</text>
+        <text x="235" y="52" fill="rgba(255,255,255,0.15)" font-size="9" font-family="Space Mono">70°</text>
+        <defs>
+          <linearGradient id="gaugeGrad" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stop-color="rgba(255,213,79,0.3)"/>
+            <stop offset="50%" stop-color="rgba(255,213,79,1)"/>
+            <stop offset="100%" stop-color="rgba(255,213,79,0.3)"/>
+          </linearGradient>
+        </defs>
+      </svg>
+      <div class="zenith-value">
+        <div class="zenith-angle">82°</div>
+        <div class="zenith-label">現在の仰角</div>
+      </div>
+    </div>
+    <div class="zenith-desc">
+      仰角70°以上を<em>8時間</em>維持。都市部のビル谷間でも<em>ほぼ真上</em>に見える位置
+    </div>
+  </div>
+
+  <!-- Shift schedule -->
+  <div class="shift-section fade-in d3">
+    <div class="section-header">
+      <div class="section-title">今日のシフト表</div>
+      <div class="section-more">週間表 →</div>
+    </div>
+    <div class="shift-timeline">
+      <div class="shift-bar-bg"></div>
+      <div class="shift-bar-progress"></div>
+
+      <div class="shift-item">
+        <div class="shift-sat-icon standby">02</div>
+        <div class="shift-info">
+          <div class="shift-name">みちびき2号機 <span style="font-size:11px;color:var(--text-dim);">QZS-2</span></div>
+          <div class="shift-detail">00:00–06:00 — 前番を完了。南半球側へ降下中</div>
+        </div>
+        <div class="shift-status rest">完了</div>
+      </div>
+
+      <div class="shift-item">
+        <div class="shift-sat-icon on-duty">03</div>
+        <div class="shift-info">
+          <div class="shift-name">みちびき3号機 <span style="font-size:11px;color:var(--text-dim);">QZS-3</span></div>
+          <div class="shift-detail">06:00–21:00 — 当番中。日本直上で高精度測位を提供</div>
+        </div>
+        <div class="shift-status active">当番中</div>
+      </div>
+
+      <div class="shift-item">
+        <div class="shift-sat-icon next">04</div>
+        <div class="shift-info">
+          <div class="shift-name">みちびき4号機 <span style="font-size:11px;color:var(--text-dim);">QZS-4</span></div>
+          <div class="shift-detail">21:00–翌06:00 — 次番。北半球側へ上昇中</div>
+        </div>
+        <div class="shift-status waiting">待機中</div>
+      </div>
+
+      <div class="shift-item">
+        <div class="shift-sat-icon geo">GEO</div>
+        <div class="shift-info">
+          <div class="shift-name">みちびき初号機後継 <span style="font-size:11px;color:var(--text-dim);">QZS-1R</span></div>
+          <div class="shift-detail">静止軌道から常時カバー。災害・危機管理通報も担当</div>
+        </div>
+        <div class="shift-status geo-badge">常駐</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Handoff -->
+  <div class="handoff-card fade-in d4">
+    <div class="handoff-header">
+      <div class="handoff-label">🔄 次の引き継ぎ</div>
+      <div class="handoff-countdown">あと 3:12:00</div>
+    </div>
+    <div class="handoff-visual">
+      <div class="handoff-sat">
+        <div class="handoff-sat-name" style="color:var(--qzs-gold);">3号機</div>
+        <div class="handoff-sat-role">当番終了</div>
+      </div>
+      <div class="handoff-arrow">→ → →</div>
+      <div class="handoff-sat">
+        <div class="handoff-sat-name" style="color:var(--qzs-green);">4号機</div>
+        <div class="handoff-sat-role">当番開始</div>
+      </div>
+    </div>
+    <div class="handoff-desc">
+      3号機が南へ降りると同時に、4号機が北から日本上空へ昇ってきます。<br>
+      引き継ぎ中もGEO衛星が常にバックアップ
+    </div>
+  </div>
+
+  <!-- Figure 8 explainer -->
+  <div class="figure8-card fade-in d5">
+    <div class="figure8-header">∞ なぜ8の字を描くのか？</div>
+    <div class="figure8-visual">
+      <div class="figure8-svg-container">
+        <svg viewBox="0 0 100 140" fill="none" width="100" height="140">
+          <!-- Figure 8 path -->
+          <path d="M 50,15 C 75,15 80,50 50,70 C 20,90 25,125 50,125 C 75,125 80,90 50,70 C 20,50 25,15 50,15"
+                stroke="rgba(255,213,79,0.4)" stroke-width="1.5" fill="none"/>
+          <!-- Japan position -->
+          <rect x="38" y="28" width="24" height="18" rx="4"
+                fill="rgba(255,213,79,0.08)" stroke="rgba(255,213,79,0.2)" stroke-width="0.5"/>
+          <text x="50" y="40" fill="rgba(255,213,79,0.5)" font-size="8" text-anchor="middle" font-family="Noto Sans JP">日本</text>
+          <!-- Top label -->
+          <text x="50" y="10" fill="rgba(255,255,255,0.2)" font-size="7" text-anchor="middle" font-family="Space Mono">北</text>
+          <text x="50" y="138" fill="rgba(255,255,255,0.2)" font-size="7" text-anchor="middle" font-family="Space Mono">南</text>
+          <!-- Satellite dots -->
+          <circle cx="50" cy="22" r="4" fill="var(--qzs-gold)" opacity="0.9">
+            <animate attributeName="cy" values="22;70;125;70;22" dur="8s" repeatCount="indefinite"/>
+            <animate attributeName="cx" values="50;70;50;30;50" dur="8s" repeatCount="indefinite"/>
+          </circle>
+        </svg>
+      </div>
+      <div class="figure8-desc-list">
+        <div class="figure8-point">
+          <div class="figure8-bullet" style="background:var(--qzs-gold);"></div>
+          <span>軌道傾斜角 約43°で赤道面に対して傾いた楕円軌道。地上から見ると非対称の8の字に見える</span>
+        </div>
+        <div class="figure8-point">
+          <div class="figure8-bullet" style="background:var(--qzs-green);"></div>
+          <span>8の字の上（北）のループが日本上空で大きく、滞在時間が長くなるよう設計されている</span>
+        </div>
+        <div class="figure8-point">
+          <div class="figure8-bullet" style="background:var(--qzs-blue);"></div>
+          <span>3機のQZO衛星が交代で日本上空をカバーし、24時間途切れない測位を実現</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Constellation overview -->
+  <div class="constellation-card fade-in d6">
+    <div class="constellation-header">みちびき全機配置図</div>
+    <div class="constellation-sub">QZO 3機 + GEO 2機 = 5機体制（2025年〜）</div>
+    <div class="constellation-visual">
+      <div class="orbit-ring-qzo"></div>
+      <div class="orbit-ring-geo"></div>
+      <div class="japan-center">🗾</div>
+
+      <!-- QZO satellites -->
+      <div class="orbit-satellite" style="top:15%;left:50%;background:rgba(255,213,79,0.15);border:2px solid rgba(255,213,79,0.4);color:var(--qzs-gold);box-shadow:0 0 12px rgba(255,213,79,0.3);">
+        03
+        <span class="sat-label" style="color:var(--qzs-gold);">当番</span>
+      </div>
+      <div class="orbit-satellite" style="top:75%;left:28%;background:rgba(100,181,246,0.1);border:2px solid rgba(100,181,246,0.2);color:var(--qzs-blue);">
+        02
+        <span class="sat-label">南半球</span>
+      </div>
+      <div class="orbit-satellite" style="top:58%;left:75%;background:rgba(129,199,132,0.1);border:2px solid rgba(129,199,132,0.2);color:var(--qzs-green);">
+        04
+        <span class="sat-label">上昇中</span>
+      </div>
+
+      <!-- GEO satellites -->
+      <div class="orbit-satellite" style="top:50%;left:12%;background:rgba(206,147,216,0.1);border:2px solid rgba(206,147,216,0.2);color:var(--qzs-purple);font-size:8px;">
+        1R
+        <span class="sat-label">GEO</span>
+      </div>
+      <div class="orbit-satellite" style="top:50%;left:90%;background:rgba(206,147,216,0.1);border:2px solid rgba(206,147,216,0.2);color:var(--qzs-purple);font-size:8px;">
+        06
+        <span class="sat-label">GEO</span>
+      </div>
+
+      <div class="orbit-type-label qzo">QZO軌道</div>
+      <div class="orbit-type-label geo">GEO静止軌道</div>
+    </div>
+    <div class="constellation-legend">
+      <div class="legend-item"><div class="legend-dot" style="background:var(--qzs-gold);"></div>当番(QZO)</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--qzs-blue);"></div>休息(QZO)</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--qzs-green);"></div>待機(QZO)</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--qzs-purple);"></div>常駐(GEO)</div>
+    </div>
+  </div>
+
+  <!-- Service status -->
+  <div class="service-card fade-in d7">
+    <div class="service-header">📊 提供サービス状況</div>
+    <div class="service-grid">
+      <div class="service-item">
+        <div class="service-icon">📍</div>
+        <div class="service-name">測位補強（SLAS）</div>
+        <div class="service-status ok">正常稼働中</div>
+      </div>
+      <div class="service-item">
+        <div class="service-icon">🆘</div>
+        <div class="service-name">災危通報（DC Report）</div>
+        <div class="service-status ok">待受中</div>
+      </div>
+      <div class="service-item">
+        <div class="service-icon">🔬</div>
+        <div class="service-name">高精度測位（CLAS）</div>
+        <div class="service-status sending">配信中 cm級</div>
+      </div>
+      <div class="service-item">
+        <div class="service-icon">✈️</div>
+        <div class="service-name">衛星航法（SBAS）</div>
+        <div class="service-status ok">正常稼働中</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Fun fact -->
+  <div class="fun-fact fade-in d8">
+    <div class="fun-fact-label">TODAY'S FACT</div>
+    <div class="fun-fact-text">
+      「みちびき」の名は<em>北極星の古名</em>に由来します。北極星が旅人を導いたように、みちびきは日本の空から正確な位置を届けています。GPSだけでは都市部で10m程度の誤差がありますが、みちびきの補強信号で<em>数cm</em>の精度に。自動運転やドローン物流の基盤技術です。
+    </div>
+  </div>
+
+  <div class="bottom-spacer"></div>
+
+  <!-- Bottom Navigation -->
+  <nav class="bottom-nav">
+    <div class="nav-item">
+      <span class="nav-icon">📡</span>
+      <span>ISS</span>
+    </div>
+    <div class="nav-item">
+      <span class="nav-icon">🗓️</span>
+      <span>可視予報</span>
+    </div>
+    <div class="nav-item active">
+      <span class="nav-icon">🛰️</span>
+      <span>みちびき</span>
+    </div>
+    <div class="nav-item">
+      <span class="nav-icon">⚙️</span>
+      <span>設定</span>
+    </div>
+  </nav>
+
+</div>
+
+<script>
+  // Countdown timer
+  let totalSec = 3 * 3600 + 12 * 60;
+  const countdownEl = document.querySelector('.handoff-countdown');
+
+  setInterval(() => {
+    totalSec--;
+    if (totalSec <= 0) totalSec = 8 * 3600;
+    const h = Math.floor(totalSec / 3600);
+    const m = Math.floor((totalSec % 3600) / 60);
+    const s = totalSec % 60;
+    countdownEl.textContent = `あと ${h}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+  }, 1000);
+
+  // Zenith angle slow change
+  let zenithAngle = 82;
+  let zenithDir = -1;
+  const zenithEl = document.querySelector('.zenith-angle');
+
+  setInterval(() => {
+    zenithAngle += zenithDir * 0.1;
+    if (zenithAngle <= 75) zenithDir = 1;
+    if (zenithAngle >= 85) zenithDir = -1;
+    zenithEl.textContent = zenithAngle.toFixed(0) + '°';
+  }, 8000);
+
+  // Shift progress bar
+  const now = new Date();
+  const hoursPassed = now.getHours() + now.getMinutes() / 60;
+  const dayProgress = (hoursPassed / 24) * 100;
+  document.querySelector('.shift-bar-progress').style.width = dayProgress + '%';
+</script>
+</body>
+</html>

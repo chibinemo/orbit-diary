@@ -1,0 +1,1118 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Orbit Diary — 推しみちびき</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700;900&family=Noto+Serif+JP:wght@300;400;500;700&family=Space+Mono:wght@400;700&display=swap');
+
+  :root {
+    --bg: #06081a;
+    --bg-card: rgba(255,255,255,0.035);
+    --border: rgba(255,255,255,0.07);
+    --text: #e4e7f0;
+    --text-sub: rgba(255,255,255,0.5);
+    --text-dim: rgba(255,255,255,0.25);
+    /* Each satellite has its own color */
+    --c2: #64b5f6;
+    --c3: #ffd54f;
+    --c4: #b39ddb;
+    --c1r: #ef9a9a;
+    --c6: #80deea;
+    --green: #81c784;
+    --pink: #f48fb1;
+    --orange: #ffab91;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Noto Sans JP', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background:
+      radial-gradient(1px 1px at 12% 20%, rgba(255,255,255,0.35), transparent),
+      radial-gradient(1.5px 1.5px at 45% 8%, rgba(255,255,255,0.4), transparent),
+      radial-gradient(1px 1px at 72% 70%, rgba(255,255,255,0.2), transparent),
+      radial-gradient(1px 1px at 88% 32%, rgba(255,255,255,0.3), transparent),
+      radial-gradient(1px 1px at 20% 85%, rgba(255,255,255,0.15), transparent),
+      radial-gradient(1px 1px at 60% 50%, rgba(255,255,255,0.25), transparent);
+    pointer-events: none; z-index: 0;
+  }
+
+  .app {
+    max-width: 430px;
+    margin: 0 auto;
+    min-height: 100vh;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* ===== Top bar ===== */
+  .top-bar {
+    padding: 52px 20px 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .top-logo {
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: var(--text);
+  }
+
+  .top-logo span { color: var(--c3); }
+
+  .top-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .notif-dot {
+    position: relative;
+    font-size: 18px;
+    cursor: pointer;
+  }
+
+  .notif-dot::after {
+    content: '';
+    position: absolute;
+    top: 0; right: -2px;
+    width: 7px; height: 7px;
+    background: var(--c1r);
+    border-radius: 50%;
+    border: 1.5px solid var(--bg);
+  }
+
+  .top-avatar {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--c3), var(--c4));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 700;
+  }
+
+  /* ===== Oshi selector (horizontal scroll) ===== */
+  .oshi-selector {
+    padding: 8px 0 16px;
+    position: relative;
+  }
+
+  .oshi-scroll {
+    display: flex;
+    gap: 12px;
+    padding: 0 20px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .oshi-scroll::-webkit-scrollbar { display: none; }
+
+  .oshi-chip {
+    flex-shrink: 0;
+    scroll-snap-align: start;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    width: 68px;
+  }
+
+  .oshi-avatar {
+    width: 56px; height: 56px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    font-weight: 900;
+    position: relative;
+    transition: all 0.3s;
+    border: 2.5px solid transparent;
+  }
+
+  .oshi-chip.active .oshi-avatar {
+    box-shadow: 0 0 20px rgba(255,213,79,0.3);
+  }
+
+  .oshi-avatar .oshi-orbit-type {
+    position: absolute;
+    bottom: -2px; right: -2px;
+    font-size: 8px;
+    padding: 1px 5px;
+    border-radius: 8px;
+    font-weight: 700;
+    border: 1.5px solid var(--bg);
+  }
+
+  .oshi-name {
+    font-size: 10px;
+    color: var(--text-dim);
+    text-align: center;
+    white-space: nowrap;
+    transition: color 0.3s;
+  }
+
+  .oshi-chip.active .oshi-name {
+    color: var(--text);
+    font-weight: 500;
+  }
+
+  .oshi-status-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    position: absolute;
+    top: 2px; right: 2px;
+    border: 1.5px solid var(--bg);
+  }
+
+  /* Specific satellite colors */
+  .sat-2 .oshi-avatar { background: rgba(100,181,246,0.15); border-color: rgba(100,181,246,0.3); color: var(--c2); }
+  .sat-3 .oshi-avatar { background: rgba(255,213,79,0.15); border-color: rgba(255,213,79,0.4); color: var(--c3); }
+  .sat-4 .oshi-avatar { background: rgba(179,157,219,0.15); border-color: rgba(179,157,219,0.3); color: var(--c4); }
+  .sat-1r .oshi-avatar { background: rgba(239,154,154,0.15); border-color: rgba(239,154,154,0.3); color: var(--c1r); }
+  .sat-6 .oshi-avatar { background: rgba(128,222,234,0.15); border-color: rgba(128,222,234,0.3); color: var(--c6); }
+  .sat-all .oshi-avatar { background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.15); color: var(--text-sub); font-size: 13px; }
+
+  .sat-3.active .oshi-avatar { border-color: var(--c3); }
+
+  /* ===== Oshi profile card ===== */
+  .oshi-profile {
+    margin: 0 20px 16px;
+    padding: 20px;
+    background: linear-gradient(135deg, rgba(255,213,79,0.08), rgba(255,213,79,0.01));
+    border: 1px solid rgba(255,213,79,0.15);
+    border-radius: 18px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .oshi-profile::before {
+    content: '';
+    position: absolute;
+    top: -30px; right: -30px;
+    width: 120px; height: 120px;
+    background: radial-gradient(circle, rgba(255,213,79,0.08), transparent 70%);
+  }
+
+  .profile-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 14px;
+  }
+
+  .profile-identity {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .profile-big-avatar {
+    width: 48px; height: 48px;
+    border-radius: 50%;
+    background: rgba(255,213,79,0.15);
+    border: 2px solid rgba(255,213,79,0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    font-weight: 900;
+    color: var(--c3);
+  }
+
+  .profile-names {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .profile-main-name {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--c3);
+  }
+
+  .profile-sub-name {
+    font-size: 11px;
+    color: var(--text-sub);
+  }
+
+  .oshi-btn {
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
+    border: none;
+    font-family: 'Noto Sans JP', sans-serif;
+    transition: all 0.2s;
+  }
+
+  .oshi-btn.following {
+    background: rgba(255,213,79,0.15);
+    color: var(--c3);
+    border: 1px solid rgba(255,213,79,0.3);
+  }
+
+  .profile-stats {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 12px;
+  }
+
+  .p-stat {
+    text-align: center;
+  }
+
+  .p-stat-val {
+    font-family: 'Space Mono', monospace;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1;
+  }
+
+  .p-stat-label {
+    font-size: 9px;
+    color: var(--text-dim);
+    margin-top: 3px;
+  }
+
+  .profile-bio {
+    font-size: 13px;
+    color: var(--text-sub);
+    line-height: 1.7;
+    font-weight: 300;
+  }
+
+  .profile-bio em {
+    font-style: normal;
+    color: var(--c3);
+    font-weight: 500;
+  }
+
+  .profile-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 10px;
+  }
+
+  .p-tag {
+    font-size: 10px;
+    padding: 3px 10px;
+    border-radius: 12px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+  }
+
+  .p-tag.active-tag {
+    background: rgba(129,199,132,0.1);
+    border-color: rgba(129,199,132,0.25);
+    color: var(--green);
+  }
+
+  /* ===== Live status ===== */
+  .live-bar {
+    margin: 0 20px 16px;
+    padding: 14px 18px;
+    background: rgba(129,199,132,0.06);
+    border: 1px solid rgba(129,199,132,0.15);
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .live-dot {
+    width: 8px; height: 8px;
+    background: var(--green);
+    border-radius: 50%;
+    box-shadow: 0 0 8px rgba(129,199,132,0.6);
+    animation: livePulse 2s ease-in-out infinite;
+  }
+
+  @keyframes livePulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(0.8); }
+  }
+
+  .live-text {
+    flex: 1;
+    font-size: 12px;
+    color: var(--text-sub);
+  }
+
+  .live-text strong {
+    color: var(--green);
+    font-weight: 500;
+  }
+
+  .live-elev {
+    font-family: 'Space Mono', monospace;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--c3);
+  }
+
+  .live-elev-label {
+    font-size: 9px;
+    color: var(--text-dim);
+    text-align: right;
+  }
+
+  /* ===== Today's diary ===== */
+  .section-label {
+    margin: 8px 20px 14px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-sub);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* Diary feed */
+  .diary-entry {
+    margin: 0 20px 16px;
+  }
+
+  .diary-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+  }
+
+  /* Card header - like a tweet/post header */
+  .card-header {
+    padding: 12px 16px 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .card-avatar {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 900;
+    flex-shrink: 0;
+  }
+
+  .card-avatar.c3 {
+    background: rgba(255,213,79,0.15);
+    border: 1.5px solid rgba(255,213,79,0.3);
+    color: var(--c3);
+  }
+
+  .card-meta {
+    flex: 1;
+  }
+
+  .card-author {
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  .card-time {
+    font-size: 10px;
+    color: var(--text-dim);
+    font-family: 'Space Mono', monospace;
+  }
+
+  .card-status {
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+  }
+
+  .card-status.on-duty {
+    background: rgba(255,213,79,0.12);
+    color: var(--c3);
+  }
+
+  /* Visual */
+  .diary-visual {
+    height: 140px;
+    margin: 10px 16px 0;
+    border-radius: 12px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .diary-visual-grad {
+    position: absolute; inset: 0;
+    background: linear-gradient(0deg, rgba(6,8,26,0.8) 0%, transparent 50%);
+    z-index: 1;
+  }
+
+  .diary-scene-tag {
+    position: absolute;
+    bottom: 10px; left: 12px;
+    z-index: 2;
+    padding: 3px 10px;
+    border-radius: 10px;
+    font-size: 10px;
+    font-weight: 500;
+    backdrop-filter: blur(8px);
+  }
+
+  /* Text */
+  .card-text {
+    padding: 12px 16px;
+    font-size: 14px;
+    line-height: 1.9;
+    color: var(--text-sub);
+    font-weight: 300;
+  }
+
+  .card-text em {
+    font-style: normal;
+    font-weight: 500;
+  }
+
+  .card-text em.gold { color: var(--c3); }
+  .card-text em.blue { color: var(--c2); }
+  .card-text em.green { color: var(--green); }
+  .card-text em.red { color: var(--c1r); }
+  .card-text em.purple { color: var(--c4); }
+  .card-text em.cyan { color: var(--c6); }
+  .card-text em.orange { color: var(--orange); }
+  .card-text em.pink { color: var(--pink); }
+
+  /* Ground event inline */
+  .card-event {
+    margin: 0 16px 14px;
+    padding: 10px 12px;
+    background: rgba(255,255,255,0.025);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .card-event-icon { font-size: 16px; flex-shrink: 0; }
+
+  .card-event-body { flex: 1; }
+
+  .card-event-title {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text);
+    margin-bottom: 2px;
+  }
+
+  .card-event-desc {
+    font-size: 11px;
+    color: var(--text-sub);
+    line-height: 1.5;
+  }
+
+  /* Card footer - engagement */
+  .card-footer {
+    padding: 8px 16px 14px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    border-top: 1px solid rgba(255,255,255,0.04);
+  }
+
+  .card-action {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 12px;
+    color: var(--text-dim);
+    cursor: pointer;
+    transition: color 0.2s;
+    padding: 4px 0;
+  }
+
+  .card-action:hover { color: var(--text-sub); }
+
+  .card-action.liked { color: var(--pink); }
+  .card-action.liked .action-icon { color: var(--pink); }
+
+  .action-icon { font-size: 14px; }
+
+  /* ===== Shift schedule mini ===== */
+  .shift-mini {
+    margin: 4px 20px 16px;
+    padding: 16px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+  }
+
+  .shift-mini-title {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-sub);
+    margin-bottom: 12px;
+  }
+
+  .shift-bar-container {
+    position: relative;
+    height: 32px;
+    background: rgba(255,255,255,0.03);
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 10px;
+  }
+
+  .shift-block {
+    position: absolute;
+    top: 0;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: 700;
+    border-radius: 6px;
+    transition: all 0.3s;
+  }
+
+  .shift-block.s2 {
+    left: 0; width: 25%;
+    background: rgba(100,181,246,0.15);
+    color: var(--c2);
+    border: 1px solid rgba(100,181,246,0.2);
+  }
+
+  .shift-block.s3 {
+    left: 25%; width: 62.5%;
+    background: rgba(255,213,79,0.12);
+    color: var(--c3);
+    border: 1px solid rgba(255,213,79,0.2);
+    box-shadow: 0 0 12px rgba(255,213,79,0.1);
+  }
+
+  .shift-block.s4 {
+    left: 87.5%; width: 12.5%;
+    background: rgba(179,157,219,0.12);
+    color: var(--c4);
+    border: 1px solid rgba(179,157,219,0.2);
+  }
+
+  .shift-now-line {
+    position: absolute;
+    top: -4px;
+    height: calc(100% + 8px);
+    width: 2px;
+    background: white;
+    border-radius: 1px;
+    box-shadow: 0 0 6px rgba(255,255,255,0.5);
+    z-index: 5;
+  }
+
+  .shift-times {
+    display: flex;
+    justify-content: space-between;
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    color: var(--text-dim);
+  }
+
+  /* ===== Constellation "members" ===== */
+  .members-section {
+    margin: 8px 20px 16px;
+  }
+
+  .members-title {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-sub);
+    margin-bottom: 10px;
+  }
+
+  .member-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+  }
+
+  .member-row:last-child { border-bottom: none; }
+
+  .member-avatar {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 900;
+    flex-shrink: 0;
+  }
+
+  .member-info { flex: 1; }
+
+  .member-name {
+    font-size: 13px;
+    font-weight: 500;
+  }
+
+  .member-desc {
+    font-size: 10px;
+    color: var(--text-dim);
+  }
+
+  .member-status {
+    font-size: 10px;
+    padding: 3px 8px;
+    border-radius: 10px;
+    font-weight: 500;
+  }
+
+  .member-status.duty { background: rgba(255,213,79,0.1); color: var(--c3); }
+  .member-status.rest { background: rgba(255,255,255,0.04); color: var(--text-dim); }
+  .member-status.wait { background: rgba(179,157,219,0.1); color: var(--c4); }
+  .member-status.always { background: rgba(239,154,154,0.1); color: var(--c1r); }
+
+  /* ===== Scene visuals ===== */
+  .vis-dawn { background: linear-gradient(180deg, #0d1028 0%, #1a1545 25%, #4a2060 55%, #d4556a 80%, #f0a050 100%); }
+  .vis-commute { background: linear-gradient(180deg, #1a2848 0%, #2a4878 35%, #4a80b8 65%, #7ab8e0 100%); }
+  .vis-quake {
+    background: linear-gradient(180deg, #1a0a0a 0%, #2a1515 40%, #3a2020 100%);
+  }
+  .vis-quake::after {
+    content: '';
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse at 50% 60%, rgba(255,80,60,0.1), transparent 60%);
+  }
+  .vis-ocean { background: linear-gradient(180deg, #0a1828 0%, #0d2848 40%, #1a5070 100%); }
+  .vis-sunset {
+    background: linear-gradient(180deg, #1a1535 0%, #3a2055 40%, #d4556a 75%, #f0a050 100%);
+  }
+  .vis-night {
+    background: linear-gradient(180deg, #050810 0%, #0a1020 100%);
+  }
+  .vis-night::after {
+    content: '';
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(1px 1px at 25% 50%, rgba(255,200,80,0.8), transparent),
+      radial-gradient(2px 2px at 45% 45%, rgba(255,220,100,0.9), transparent),
+      radial-gradient(1px 1px at 60% 55%, rgba(255,180,60,0.6), transparent),
+      radial-gradient(1.5px 1.5px at 55% 48%, rgba(255,240,120,0.7), transparent),
+      radial-gradient(1px 1px at 35% 58%, rgba(255,200,80,0.5), transparent),
+      radial-gradient(1px 1px at 70% 42%, rgba(255,180,60,0.4), transparent);
+  }
+
+  /* Bottom nav */
+  .bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 430px;
+    background: rgba(6,8,26,0.94);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-around;
+    padding: 10px 0 28px;
+    z-index: 100;
+  }
+
+  .nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    font-size: 10px;
+    color: var(--text-dim);
+    cursor: pointer;
+    padding: 4px 12px;
+  }
+
+  .nav-item.active { color: var(--c3); }
+  .nav-item .nav-icon { font-size: 18px; }
+
+  .bottom-spacer { height: 80px; }
+
+  .fade-in { animation: fadeIn 0.5s ease-out both; }
+  .d1{animation-delay:.06s;}.d2{animation-delay:.12s;}.d3{animation-delay:.18s;}
+  .d4{animation-delay:.24s;}.d5{animation-delay:.3s;}.d6{animation-delay:.36s;}
+  .d7{animation-delay:.42s;}.d8{animation-delay:.48s;}.d9{animation-delay:.54s;}
+  .d10{animation-delay:.6s;}
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  ::-webkit-scrollbar { display: none; }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- Top bar -->
+  <div class="top-bar fade-in">
+    <div class="top-logo">Orbit <span>Diary</span></div>
+    <div class="top-right">
+      <div class="notif-dot">🔔</div>
+      <div class="top-avatar">M</div>
+    </div>
+  </div>
+
+  <!-- Oshi selector -->
+  <div class="oshi-selector fade-in d1">
+    <div class="oshi-scroll">
+      <div class="oshi-chip sat-all">
+        <div class="oshi-avatar">ALL</div>
+        <div class="oshi-name">箱推し</div>
+      </div>
+      <div class="oshi-chip sat-2">
+        <div class="oshi-avatar">
+          02
+          <div class="oshi-status-dot" style="background:var(--text-dim);"></div>
+          <div class="oshi-orbit-type" style="background:rgba(100,181,246,0.2);color:var(--c2);">QZO</div>
+        </div>
+        <div class="oshi-name">2号機</div>
+      </div>
+      <div class="oshi-chip sat-3 active">
+        <div class="oshi-avatar">
+          03
+          <div class="oshi-status-dot" style="background:var(--c3);box-shadow:0 0 6px rgba(255,213,79,0.5);"></div>
+          <div class="oshi-orbit-type" style="background:rgba(255,213,79,0.25);color:var(--c3);">QZO</div>
+        </div>
+        <div class="oshi-name">3号機</div>
+      </div>
+      <div class="oshi-chip sat-4">
+        <div class="oshi-avatar">
+          04
+          <div class="oshi-status-dot" style="background:var(--c4);"></div>
+          <div class="oshi-orbit-type" style="background:rgba(179,157,219,0.2);color:var(--c4);">QZO</div>
+        </div>
+        <div class="oshi-name">4号機</div>
+      </div>
+      <div class="oshi-chip sat-1r">
+        <div class="oshi-avatar" style="font-size:12px;">
+          1R
+          <div class="oshi-status-dot" style="background:var(--green);"></div>
+          <div class="oshi-orbit-type" style="background:rgba(239,154,154,0.2);color:var(--c1r);">GEO</div>
+        </div>
+        <div class="oshi-name">初号機後継</div>
+      </div>
+      <div class="oshi-chip sat-6">
+        <div class="oshi-avatar">
+          06
+          <div class="oshi-status-dot" style="background:var(--green);"></div>
+          <div class="oshi-orbit-type" style="background:rgba(128,222,234,0.2);color:var(--c6);">GEO</div>
+        </div>
+        <div class="oshi-name">6号機</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Oshi profile card -->
+  <div class="oshi-profile fade-in d2">
+    <div class="profile-top">
+      <div class="profile-identity">
+        <div class="profile-big-avatar">03</div>
+        <div class="profile-names">
+          <div class="profile-main-name">みちびき3号機</div>
+          <div class="profile-sub-name">QZS-3 / 準天頂軌道 / 2017.8.19 打上げ</div>
+        </div>
+      </div>
+      <button class="oshi-btn following">推し ✓</button>
+    </div>
+    <div class="profile-stats">
+      <div class="p-stat">
+        <div class="p-stat-val">3,197</div>
+        <div class="p-stat-label">運用日数</div>
+      </div>
+      <div class="p-stat">
+        <div class="p-stat-val">8.7年</div>
+        <div class="p-stat-label">在軌期間</div>
+      </div>
+      <div class="p-stat">
+        <div class="p-stat-val">~32億</div>
+        <div class="p-stat-label">累計測位(推定)</div>
+      </div>
+    </div>
+    <div class="profile-bio">
+      日中番担当。<em>朝6時に2号機から引き継ぎ、夜9時に4号機へ渡す</em>。通勤ラッシュ、昼休み、帰宅時間。日本が最も動いている時間帯を、ほぼ真上から見守っている。
+    </div>
+    <div class="profile-tags">
+      <div class="p-tag active-tag">当番中</div>
+      <div class="p-tag">QZO軌道</div>
+      <div class="p-tag">日中シフト</div>
+      <div class="p-tag">SLAS</div>
+      <div class="p-tag">CLAS</div>
+      <div class="p-tag">DC Report</div>
+    </div>
+  </div>
+
+  <!-- Live status -->
+  <div class="live-bar fade-in d3">
+    <div class="live-dot"></div>
+    <div class="live-text">
+      <strong>当番中</strong> — 日本上空、8の字の頂点付近
+    </div>
+    <div style="text-align:right;">
+      <div class="live-elev">79°</div>
+      <div class="live-elev-label">仰角</div>
+    </div>
+  </div>
+
+  <!-- Today's diary -->
+  <div class="section-label fade-in d4">📖 3号機の今日の日記</div>
+
+  <!-- Post 1 -->
+  <div class="diary-entry fade-in d4">
+    <div class="diary-card">
+      <div class="card-header">
+        <div class="card-avatar c3">03</div>
+        <div class="card-meta">
+          <div class="card-author" style="color:var(--c3);">みちびき3号機</div>
+          <div class="card-time">06:00 JST — 当番開始</div>
+        </div>
+        <div class="card-status on-duty">ON DUTY</div>
+      </div>
+      <div class="diary-visual vis-dawn" style="margin:10px 16px 0;border-radius:12px;">
+        <div class="diary-visual-grad"></div>
+        <div class="diary-scene-tag" style="background:rgba(255,213,79,0.3);color:var(--c3);">🌅 引き継ぎ</div>
+      </div>
+      <div class="card-text">
+        2号機、おつかれ。深夜帯ありがとう。<br>
+        こっちは今日も<em class="gold">仰角70°</em>からスタート。四国の太平洋側に朝日が差してる。始発の<em class="blue">のぞみ1号</em>が東京駅を出た。私の信号で走り出す朝。
+      </div>
+      <div class="card-event">
+        <div class="card-event-icon">🚄</div>
+        <div class="card-event-body">
+          <div class="card-event-title">のぞみ1号 東京6:00発 → 博多</div>
+          <div class="card-event-desc">車両制御にQZSS高精度測位を利用。2時間21分で1,000km。</div>
+        </div>
+      </div>
+      <div class="card-footer">
+        <div class="card-action liked"><span class="action-icon">♥</span> 2,847</div>
+        <div class="card-action"><span class="action-icon">💬</span> 124</div>
+        <div class="card-action"><span class="action-icon">🔄</span> 531</div>
+        <div class="card-action"><span class="action-icon">📌</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Post 2 -->
+  <div class="diary-entry fade-in d5">
+    <div class="diary-card">
+      <div class="card-header">
+        <div class="card-avatar c3">03</div>
+        <div class="card-meta">
+          <div class="card-author" style="color:var(--c3);">みちびき3号機</div>
+          <div class="card-time">08:30 JST — 朝の大仕事</div>
+        </div>
+      </div>
+      <div class="diary-visual vis-commute" style="margin:10px 16px 0;border-radius:12px;">
+        <div class="diary-visual-grad"></div>
+        <div class="diary-scene-tag" style="background:rgba(100,181,246,0.3);color:var(--c2);">📍 ラッシュアワー</div>
+      </div>
+      <div class="card-text">
+        きた、通勤ピーク。<em class="blue">測位リクエストが一気に跳ねる</em>。何百万台のスマホが同時に「ここはどこ？」って聞いてくる。丸の内のビル谷間、新宿の地下道の出口。GPSだけだと10mズレるけど、<em class="gold">私がほぼ真上にいるから数cmで返せる</em>。地味だけど、これが私の仕事。
+      </div>
+      <div class="card-event">
+        <div class="card-event-icon">🚜</div>
+        <div class="card-event-body">
+          <div class="card-event-title">十勝 — 無人トラクター48台が同時稼働</div>
+          <div class="card-event-desc">CLAS信号でcm級直線精度。農家さんはタブレットでコーヒー飲みながら見てるらしい。</div>
+        </div>
+      </div>
+      <div class="card-footer">
+        <div class="card-action liked"><span class="action-icon">♥</span> 4,102</div>
+        <div class="card-action"><span class="action-icon">💬</span> 287</div>
+        <div class="card-action"><span class="action-icon">🔄</span> 892</div>
+        <div class="card-action"><span class="action-icon">📌</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Post 3: Earthquake -->
+  <div class="diary-entry fade-in d6">
+    <div class="diary-card">
+      <div class="card-header">
+        <div class="card-avatar c3">03</div>
+        <div class="card-meta">
+          <div class="card-author" style="color:var(--c3);">みちびき3号機</div>
+          <div class="card-time">12:18 JST — 緊急</div>
+        </div>
+      </div>
+      <div class="diary-visual vis-quake" style="margin:10px 16px 0;border-radius:12px;">
+        <div class="diary-visual-grad"></div>
+        <div class="diary-scene-tag" style="background:rgba(239,154,154,0.35);color:var(--c1r);">⚠️ 災危通報</div>
+      </div>
+      <div class="card-text">
+        <em class="red">宮城県沖 M5.3</em>。<br>
+        気象庁からデータを受け取って、<em class="gold">6秒で全国に配信した</em>。携帯の電波が届かない山間部にも、私の信号なら直接届く。これは、東日本大震災の教訓から生まれた機能。今日は仰角82°。日本中どこでも受信できる角度。<br><br>
+        1R、バックアップありがとう。GEOの安定感、頼りになる。
+      </div>
+      <div class="card-event">
+        <div class="card-event-icon">📡</div>
+        <div class="card-event-body">
+          <div class="card-event-title">DC Report 配信完了 — 津波注意報なし</div>
+          <div class="card-event-desc">震度4：宮城県北部。衛星直接受信のため通信インフラ非依存。全国の対応受信機が即時受信。</div>
+        </div>
+      </div>
+      <div class="card-footer">
+        <div class="card-action liked"><span class="action-icon">♥</span> 12,403</div>
+        <div class="card-action"><span class="action-icon">💬</span> 1,892</div>
+        <div class="card-action"><span class="action-icon">🔄</span> 5,204</div>
+        <div class="card-action"><span class="action-icon">📌</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Post 4: Handoff -->
+  <div class="diary-entry fade-in d7">
+    <div class="diary-card">
+      <div class="card-header">
+        <div class="card-avatar c3">03</div>
+        <div class="card-meta">
+          <div class="card-author" style="color:var(--c3);">みちびき3号機</div>
+          <div class="card-time">20:30 JST — もうすぐ引き継ぎ</div>
+        </div>
+      </div>
+      <div class="diary-visual vis-night" style="margin:10px 16px 0;border-radius:12px;">
+        <div class="diary-visual-grad"></div>
+        <div class="diary-scene-tag" style="background:rgba(179,157,219,0.3);color:var(--c4);">🔄 バトンタッチ</div>
+      </div>
+      <div class="card-text">
+        今日も15時間、真上にいた。日本列島が夜景に変わった。太平洋ベルトが地上で一番明るい線になる。<br><br>
+        <em class="purple">4号機</em>が北から上がってきてるのが電波でわかる。あと30分で引き継ぎ。4号機、今夜の終電までよろしく。<br><br>
+        私は8の字の下半分へ。南半球側でしばらく休む。明後日また日本の真上に戻ってくるよ。
+      </div>
+      <div class="card-footer">
+        <div class="card-action liked"><span class="action-icon">♥</span> 6,721</div>
+        <div class="card-action"><span class="action-icon">💬</span> 843</div>
+        <div class="card-action"><span class="action-icon">🔄</span> 2,108</div>
+        <div class="card-action"><span class="action-icon">📌</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Shift schedule mini -->
+  <div class="shift-mini fade-in d8">
+    <div class="shift-mini-title">今日のシフト</div>
+    <div class="shift-bar-container">
+      <div class="shift-block s2">2号機</div>
+      <div class="shift-block s3">3号機（推し）</div>
+      <div class="shift-block s4">4号</div>
+      <div class="shift-now-line" style="left:77%;"></div>
+    </div>
+    <div class="shift-times">
+      <span>00:00</span>
+      <span>06:00</span>
+      <span>12:00</span>
+      <span>18:00</span>
+      <span>24:00</span>
+    </div>
+  </div>
+
+  <!-- Members -->
+  <div class="members-section fade-in d9">
+    <div class="members-title">コンステレーションメンバー</div>
+    <div class="member-row">
+      <div class="member-avatar" style="background:rgba(100,181,246,0.12);border:1.5px solid rgba(100,181,246,0.25);color:var(--c2);font-size:12px;font-weight:900;">02</div>
+      <div class="member-info">
+        <div class="member-name" style="color:var(--c2);">みちびき2号機</div>
+        <div class="member-desc">深夜番。みんなが寝てる間の守り手。2017.6.1打上げ</div>
+      </div>
+      <div class="member-status rest">休息中</div>
+    </div>
+    <div class="member-row">
+      <div class="member-avatar" style="background:rgba(255,213,79,0.12);border:1.5px solid rgba(255,213,79,0.3);color:var(--c3);font-size:12px;font-weight:900;">03</div>
+      <div class="member-info">
+        <div class="member-name" style="color:var(--c3);">みちびき3号機 ⭐</div>
+        <div class="member-desc">日中番。日本が一番動いてる時間を真上から。推し</div>
+      </div>
+      <div class="member-status duty">当番中</div>
+    </div>
+    <div class="member-row">
+      <div class="member-avatar" style="background:rgba(179,157,219,0.12);border:1.5px solid rgba(179,157,219,0.25);color:var(--c4);font-size:12px;font-weight:900;">04</div>
+      <div class="member-info">
+        <div class="member-name" style="color:var(--c4);">みちびき4号機</div>
+        <div class="member-desc">夜番。夕方から終電まで。夜景マスター。2017.10.10打上げ</div>
+      </div>
+      <div class="member-status wait">待機中</div>
+    </div>
+    <div class="member-row">
+      <div class="member-avatar" style="background:rgba(239,154,154,0.12);border:1.5px solid rgba(239,154,154,0.25);color:var(--c1r);font-size:10px;font-weight:900;">1R</div>
+      <div class="member-info">
+        <div class="member-name" style="color:var(--c1r);">みちびき初号機後継</div>
+        <div class="member-desc">GEO常駐。動かない安心感。災危通報のベテラン。2023打上げ</div>
+      </div>
+      <div class="member-status always">常駐</div>
+    </div>
+    <div class="member-row">
+      <div class="member-avatar" style="background:rgba(128,222,234,0.12);border:1.5px solid rgba(128,222,234,0.25);color:var(--c6);font-size:12px;font-weight:900;">06</div>
+      <div class="member-info">
+        <div class="member-name" style="color:var(--c6);">みちびき6号機</div>
+        <div class="member-desc">GEOの新人。1Rの相棒。2024打上げ。まだ緊張してる</div>
+      </div>
+      <div class="member-status always">常駐</div>
+    </div>
+  </div>
+
+  <div class="bottom-spacer"></div>
+
+  <nav class="bottom-nav">
+    <div class="nav-item active">
+      <span class="nav-icon">📖</span>
+      <span>推しの日記</span>
+    </div>
+    <div class="nav-item">
+      <span class="nav-icon">🏠</span>
+      <span>箱推し</span>
+    </div>
+    <div class="nav-item">
+      <span class="nav-icon">📊</span>
+      <span>推し活動</span>
+    </div>
+    <div class="nav-item">
+      <span class="nav-icon">⚙️</span>
+      <span>設定</span>
+    </div>
+  </nav>
+
+</div>
+</body>
+</html>
