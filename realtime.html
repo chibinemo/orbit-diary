@@ -1115,23 +1115,8 @@ function update() {
   buildSatsList(positions);
 }
 
-// ========== GEOLOCATION ==========
-function tryGeo() {
-  if ('geolocation' in navigator) {
-    navigator.geolocation.getCurrentPosition(pos => {
-      observer.lat = pos.coords.latitude;
-      observer.lon = pos.coords.longitude;
-      observer.alt = (pos.coords.altitude || 0) / 1000;
-      document.getElementById('obsName').textContent = '現在地';
-      document.getElementById('obsCoords').textContent =
-        `${observer.lat.toFixed(4)}°${observer.lat > 0 ? 'N' : 'S'}, ${observer.lon.toFixed(4)}°${observer.lon > 0 ? 'E' : 'W'}`;
-    }, () => {});
-  }
-}
-
 // ========== INIT ==========
 async function init() {
-  tryGeo();
   await fetchTLEs();
 
   // Ensure we always have data
